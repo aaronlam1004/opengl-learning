@@ -1,73 +1,35 @@
-#include "Buffers.hpp"
-#include "Shader.hpp"
-#include "Texture.hpp"
-#include "Constants.hpp"
-#include <iostream>
-
-static constexpr unsigned int NUM_RESOURCES = 1;
-
-struct Resource
-{
-    // Vertices
-    float* vertices;
-    unsigned int numVertices;
-
-    // Shader
-    const char** shaderFiles;
-
-    // Indices
-    float* indices;
-    unsigned int numIndices;
-
-    // Texture
-    const char** textureFiles;
+float TRIANGLE_VERTICES[] = {
+    // aPos(xyz)
+    -0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f
 };
 
-const Resource RESOURCES[] = {
-    {
-        TRIANGLE,
-        sizeof(TRIANGLE),
-        SHADER_FILES[0],
-        nullptr,
-        0,
-        nullptr
-    }
+float SQUARE_VERTICES[] = {
+     // aPos(xyz)
+     0.5f,  0.5f, 0.0f, // top right
+     0.5f, -0.5f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,	// top left
 };
 
-void loadVertexAttributes(int index, VAO& vao)
-{
-    switch (index)
-    {
-        case 0:
-        {
-            vao.load({ 0, 3, 3 * sizeof(float), 0 }); // pos
-        } break;;
-        default: break;
-    }
-}
+float CONTAINER_VERTICES[] = {
+     // aPos (xyz)      // aColor (RGB)   //aTexCoord (xy)
+     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left 
+};
 
+unsigned int SQUARE_INDICES[] = {
+    0, 1, 3, // 1st triangle
+    1, 2, 3  // 2nd triangle
+};
 
-void loadResource(unsigned int index, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture)
-{
-    if (index < NUM_RESOURCES)
-    {
-        Resource resource = RESOURCES[index];
+const char* SHADER_FILES[][2] = {
+    { "shaders/hello_triangle/shader.vert", "shaders/hello_triangle/shader.frag" }
+};
 
-        // Texture
-        // texture = &resource.texture;
-        
-        // Shader
-        shader.load(resource.shaderFiles[0], resource.shaderFiles[1]);
-        
-        // Vertex buffer object
-        vbo.load(resource.vertices, resource.numVertices);
-
-        // Vertex array object
-        loadVertexAttributes(index, vao);
-
-        // Element buffer object
-        if (resource.indices != nullptr)
-        {
-        }
-    }
-}
+const char* TEXTURE_FILES[] = {
+    "resources/textures/container.jpg"
+};

@@ -12,6 +12,7 @@ class Texture
         void use();
     
     private:
+        bool loaded = false;
         unsigned int id;
         int width = 0;
         int height = 0;

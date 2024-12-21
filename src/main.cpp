@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Resources.hpp"
+#include "Assets.hpp"
 #include "Buffers.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -34,16 +34,44 @@ unsigned int squareIndices[] = {
     1, 2, 3  // 2nd triangle
 };
 
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+int assetIndex = 0;
+Shader* shaderP;
+Texture* textureP;
+VBO* vboP;
+VAO* vaoP;
+EBO* eboP;
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window)
+void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int mods)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (action == GLFW_PRESS)
     {
-        glfwSetWindowShouldClose(window, true);
+        switch (key)
+        {
+            case GLFW_KEY_ESCAPE:
+            {
+                glfwSetWindowShouldClose(window, true); 
+            } break;
+            case GLFW_KEY_RIGHT:
+            {
+                assetIndex++;
+                if (assetIndex >= NUM_ASSETS) assetIndex = 0;
+                loadAsset(assetIndex, *vboP, *vaoP, *eboP, *shaderP, *textureP);
+                printf("RIGHT\n");
+            } break;
+            case GLFW_KEY_LEFT:
+            {
+                assetIndex--;
+                if (assetIndex < 0) assetIndex = (NUM_ASSETS - 1);
+                loadAsset(assetIndex, *vboP, *vaoP, *eboP, *shaderP, *textureP);
+                printf("LEFT\n");
+            } break;
+            default: break;
+        }
     }
 }
 
@@ -74,7 +102,13 @@ int main()
     VBO vbo;
     VAO vao;
     EBO ebo;
-    loadResource(0, vbo, vao, ebo, shader, texture);
+    loadAsset(assetIndex, vbo, vao, ebo, shader, texture);
+    
+    shaderP = &shader;
+    textureP = &texture;
+    vboP = &vbo;
+    vaoP = &vao;
+    eboP = &ebo;
     
     /*
     // Texture
@@ -119,7 +153,8 @@ int main()
     // ebo.load(squareIndices, sizeof(squareIndices));
 
     // Set user inputs
-    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetKeyCallback(window, processKeyPress);
 
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -129,13 +164,12 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // Input processing
-        processInput(window);
         
         // Rendering
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Textures
-        // texture.use();
+        texture.use();
 
         // Shaders
         shader.use();
@@ -144,9 +178,9 @@ int main()
         // float green = (sin(timeVal) / 2.0f) / 0.5f;
         // vec4 color = {0.0, green, 0.0, 1.0};
         // shader.setVec4("ourColor", color);
-        
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        if (assetIndex == 0) glDrawArrays(GL_TRIANGLES, 0, 3);
+        else glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
         // Event handling and buffer swapping
         glfwSwapBuffers(window);

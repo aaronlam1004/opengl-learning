@@ -28,6 +28,7 @@ class Shader
         int findVar(const char* varName);
     
     private:
+        bool loaded = false;
         unsigned int id = glCreateProgram();
         unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
         unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);

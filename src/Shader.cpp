@@ -17,6 +17,7 @@ void Shader::load(const char* vertexShaderFile, const char* fragmentShaderFile)
     loadVertexShader(vertexShaderFile);
     loadFragmentShader(fragmentShaderFile);
     compile();
+    loaded = true;
 }
 
 //
@@ -24,7 +25,10 @@ void Shader::load(const char* vertexShaderFile, const char* fragmentShaderFile)
 //
 void Shader::use()
 {
-    glUseProgram(id);
+    if (loaded)
+    {
+        glUseProgram(id);
+    }
 }
 
 //
@@ -55,7 +59,6 @@ void Shader::loadVertexShader(const char* vertexShaderFile)
     vertexShaderStream << vertexShaderSource.rdbuf();
     vertexShaderSource.close();
     vertexShader = vertexShaderStream.str();
-    std::cout << vertexShader << std::endl;
 }
 
 //
@@ -70,7 +73,6 @@ void Shader::loadFragmentShader(const char* fragmentShaderFile)
     fragmentShaderStream << fragmentShaderSource.rdbuf();
     fragmentShaderSource.close();
     fragmentShader = fragmentShaderStream.str();
-    std::cout << fragmentShader << std::endl;
 }
 
 //

@@ -31,12 +31,16 @@ void Texture::load(const char* textureFile)
         glGenerateMipmap(GL_TEXTURE_2D);
         stbi_image_free(data);
     }
+    loaded = true;
 }
 
 void Texture::use()
 {
-    // glActiveTexture(0);
-    glBindTexture(GL_TEXTURE_2D, id);
+    if (loaded)
+    {
+        // glActiveTexture(0);
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
 }
 
 
