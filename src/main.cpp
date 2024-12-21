@@ -2,19 +2,36 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "shader.hpp"
+#include "Resources.hpp"
+#include "Buffers.hpp"
+#include "Shader.hpp"
+#include "Texture.hpp"
 
-float vertices[] = {
-    // First triangle
+float triangleVertices[] = {
+    // aPos (xyz)       // aColor (RGB)
+    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+     0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f
+};
+
+float squareVertices[] = {
      0.5f,  0.5f, 0.0f, // top right
      0.5f, -0.5f, 0.0f, // bottom right
     -0.5f, -0.5f, 0.0f, // bottom left
     -0.5f,  0.5f, 0.0f,	// top left
 };
 
-unsigned int indices[] = {
-    0, 1, 3,
-    1, 2, 3
+float containerVertices[] = {
+     // aPos (xyz)      // aColor (RGB)   //aTexCoord (xy)
+     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left 
+};
+
+unsigned int squareIndices[] = {
+    0, 1, 3, // 1st triangle
+    1, 2, 3  // 2nd triangle
 };
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -52,29 +69,54 @@ int main()
         return -1;
     }
 
+    Shader shader;
+    Texture texture;
+    VBO vbo;
+    VAO vao;
+    EBO ebo;
+    loadResource(0, vbo, vao, ebo, shader, texture);
+    
+    /*
+    // Texture
+    Texture texture;
+    texture.load("resources/textures/container.jpg");
+
     // Shader
     Shader shader;
-    shader.load("src/shader.vert", "src/shader.frag");
-    shader.compile();
-
+    shader.load("shaders/shader.vert", "shaders/shader.frag");
+    
     // Setup vertex buffer
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    VBO vbo;
+    vbo.load(triangleVertices, sizeof(triangleVertices));
 
-    // Setup vertex attributes
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
-    glEnableVertexAttribArray(0);
+    // Setup vertex array object
+    VAO vao;
+    VAO::VertexAttribute attrPos = {
+        0,
+        3,
+        8 * sizeof(float),
+        0
+    };
+    VAO::VertexAttribute attrColor = {
+        1,
+        3,
+        8 * sizeof(float),
+        attrPos.start + (3 * sizeof(float))
+    };
+    VAO::VertexAttribute attrTexturePos = {
+        2,
+        2,
+        8 * sizeof(float),
+        attrColor.start + (3 * sizeof(float))
+    };
+    vao.load(attrPos);
+    vao.load(attrColor);
+    vao.load(attrTexturePos);
+    */
 
     // Element buffer objects
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // EBO ebo;
+    // ebo.load(squareIndices, sizeof(squareIndices));
 
     // Set user inputs
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
@@ -82,7 +124,7 @@ int main()
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     while (!glfwWindowShouldClose(window))
     {
@@ -91,22 +133,29 @@ int main()
         
         // Rendering
         glClear(GL_COLOR_BUFFER_BIT);
-        
+
+        // Textures
+        // texture.use();
+
+        // Shaders
         shader.use();
-        float timeVal = glfwGetTime();
-        float green = (sin(timeVal) / 2.0f) / 0.5f;
-        vec4 color = {0.0, green, 0.0, 1.0};
-        shader.setVec4("ourColor", color);
+        // shader.setInt("ourTexture", 0);
+        // float timeVal = glfwGetTime();
+        // float green = (sin(timeVal) / 2.0f) / 0.5f;
+        // vec4 color = {0.0, green, 0.0, 1.0};
+        // shader.setVec4("ourColor", color);
         
-        glBindVertexArray(VAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
         // Event handling and buffer swapping
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    vbo.del();
+    vao.del();
+    ebo.del();
     
     glfwTerminate();
     return 0;
