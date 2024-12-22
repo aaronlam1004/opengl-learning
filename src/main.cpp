@@ -7,39 +7,14 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 
-float triangleVertices[] = {
-    // aPos (xyz)       // aColor (RGB)
-    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-     0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f
-};
-
-float squareVertices[] = {
-     0.5f,  0.5f, 0.0f, // top right
-     0.5f, -0.5f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, // bottom left
-    -0.5f,  0.5f, 0.0f,	// top left
-};
-
-float containerVertices[] = {
-     // aPos (xyz)      // aColor (RGB)   //aTexCoord (xy)
-     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left 
-};
-
-unsigned int squareIndices[] = {
-    0, 1, 3, // 1st triangle
-    1, 2, 3  // 2nd triangle
-};
-
 int assetIndex = 0;
 Shader* shaderP;
 Texture* textureP;
 VBO* vboP;
 VAO* vaoP;
 EBO* eboP;
+
+bool polygonMode = false;
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -61,14 +36,18 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
                 assetIndex++;
                 if (assetIndex >= NUM_ASSETS) assetIndex = 0;
                 loadAsset(assetIndex, *vboP, *vaoP, *eboP, *shaderP, *textureP);
-                printf("RIGHT\n");
             } break;
             case GLFW_KEY_LEFT:
             {
                 assetIndex--;
                 if (assetIndex < 0) assetIndex = (NUM_ASSETS - 1);
                 loadAsset(assetIndex, *vboP, *vaoP, *eboP, *shaderP, *textureP);
-                printf("LEFT\n");
+            } break;
+            case GLFW_KEY_TAB:
+            {
+                if (polygonMode) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                else glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                polygonMode = !polygonMode;
             } break;
             default: break;
         }
@@ -109,48 +88,6 @@ int main()
     vboP = &vbo;
     vaoP = &vao;
     eboP = &ebo;
-    
-    /*
-    // Texture
-    Texture texture;
-    texture.load("resources/textures/container.jpg");
-
-    // Shader
-    Shader shader;
-    shader.load("shaders/shader.vert", "shaders/shader.frag");
-    
-    // Setup vertex buffer
-    VBO vbo;
-    vbo.load(triangleVertices, sizeof(triangleVertices));
-
-    // Setup vertex array object
-    VAO vao;
-    VAO::VertexAttribute attrPos = {
-        0,
-        3,
-        8 * sizeof(float),
-        0
-    };
-    VAO::VertexAttribute attrColor = {
-        1,
-        3,
-        8 * sizeof(float),
-        attrPos.start + (3 * sizeof(float))
-    };
-    VAO::VertexAttribute attrTexturePos = {
-        2,
-        2,
-        8 * sizeof(float),
-        attrColor.start + (3 * sizeof(float))
-    };
-    vao.load(attrPos);
-    vao.load(attrColor);
-    vao.load(attrTexturePos);
-    */
-
-    // Element buffer objects
-    // EBO ebo;
-    // ebo.load(squareIndices, sizeof(squareIndices));
 
     // Set user inputs
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -158,8 +95,6 @@ int main()
 
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     while (!glfwWindowShouldClose(window))
     {
@@ -173,14 +108,23 @@ int main()
 
         // Shaders
         shader.use();
-        // shader.setInt("ourTexture", 0);
-        // float timeVal = glfwGetTime();
-        // float green = (sin(timeVal) / 2.0f) / 0.5f;
-        // vec4 color = {0.0, green, 0.0, 1.0};
-        // shader.setVec4("ourColor", color);
 
-        if (assetIndex == 0) glDrawArrays(GL_TRIANGLES, 0, 3);
-        else glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        if (assetIndex == 3)
+        {
+            float timeVal = glfwGetTime();
+            float green = (sin(timeVal) / 2.0f) / 0.5f;
+            vec4 color = {0.0, green, 0.0, 1.0};
+            shader.setVec4("ourColor", color);
+        }
+
+        if (ebo.isLoaded())
+        {
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        }
+        else
+        {
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
         
         // Event handling and buffer swapping
         glfwSwapBuffers(window);

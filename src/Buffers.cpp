@@ -48,10 +48,20 @@ EBO::EBO()
     glGenBuffers(1, &id);
 }
 
+bool EBO::isLoaded()
+{
+    return loaded;
+}
+
 void EBO::load(const unsigned int indices[], const unsigned int numIndices)
 {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices, indices, GL_STATIC_DRAW);
+    loaded = false;
+    if (indices != nullptr)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices, indices, GL_STATIC_DRAW);
+        loaded = true;
+    }
 }
 
 void EBO::del()

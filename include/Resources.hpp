@@ -5,6 +5,13 @@ float TRIANGLE_VERTICES[] = {
      0.5f, -0.5f, 0.0f
 };
 
+float COLORED_TRIANGLE_VERTICES[] = {
+    // aPos (xyz)       // aColor (RGB)
+    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+     0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f
+};
+
 float SQUARE_VERTICES[] = {
      // aPos(xyz)
      0.5f,  0.5f, 0.0f, // top right
@@ -27,7 +34,10 @@ unsigned int SQUARE_INDICES[] = {
 };
 
 const char* SHADER_FILES[][2] = {
-    { "shaders/hello_triangle/shader.vert", "shaders/hello_triangle/shader.frag" }
+    { "shaders/hello_triangle/shader.vert", "shaders/hello_triangle/shader.frag" },
+    { "shaders/red_triangle/shader.vert", "shaders/red_triangle/shader.frag" },
+    { "shaders/shaders_uniform/shader.vert", "shaders/shaders_uniform/shader.frag" },
+    { "shaders/textures/shader.vert", "shaders/textures/shader.frag" },
 };
 
 const char* TEXTURE_FILES[] = {

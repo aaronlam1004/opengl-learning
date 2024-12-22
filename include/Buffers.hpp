@@ -39,9 +39,11 @@ class EBO
 {
     public:
         EBO();
+        bool isLoaded();
         void load(const unsigned int indices[], const unsigned int numIndices);
         void del();
     
     private:
         unsigned int id;
+        bool loaded = false;
 };
