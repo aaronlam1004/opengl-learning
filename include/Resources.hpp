@@ -37,6 +37,7 @@ const char* SHADER_FILES[][2] = {
     { "shaders/hello_triangle/shader.vert", "shaders/hello_triangle/shader.frag" },
     { "shaders/red_triangle/shader.vert", "shaders/red_triangle/shader.frag" },
     { "shaders/shaders_uniform/shader.vert", "shaders/shaders_uniform/shader.frag" },
+    { "shaders/shaders_interpolation/shader.vert", "shaders/shaders_interpolation/shader.frag" },
     { "shaders/textures/shader.vert", "shaders/textures/shader.frag" },
 };
 

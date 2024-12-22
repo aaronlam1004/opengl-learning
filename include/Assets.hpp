@@ -55,9 +55,17 @@ const Asset ASSETS[] = {
         nullptr
     },
     {
+        COLORED_TRIANGLE_VERTICES,
+        sizeof(COLORED_TRIANGLE_VERTICES),
+        SHADER_FILES[3],
+        nullptr,
+        0,
+        nullptr
+    },
+    {
         CONTAINER_VERTICES,
         sizeof(CONTAINER_VERTICES),
-        SHADER_FILES[3],
+        SHADER_FILES[4],
         SQUARE_INDICES,
         sizeof(SQUARE_INDICES),
         TEXTURE_FILES[0]
@@ -75,13 +83,21 @@ void loadVertexAttributes(int index, VAO& vao)
         case 2:
         case 3:
         {
-            vao.load({ 0, 3, 3 * sizeof(float), 0 }); // pos
+            unsigned int totalSize = 3 * sizeof(float); // pos (3)
+            vao.load({ 0, 3, totalSize, 0 }); // pos (xyz)
         } break;
         case 4:
         {
-            vao.load({ 0, 3, 8 * sizeof(float), 0 }); // pos
-            vao.load({ 1, 3, 8 * sizeof(float), 3 * sizeof(float) }); // color
-            vao.load({ 2, 2, 8 * sizeof(float), 6 * sizeof(float) }); // texture coords
+            unsigned int totalSize = 6 * sizeof(float); // pos (3) + color (3)
+            vao.load({ 0, 3, totalSize, 0 }); // pos (xyz)
+            vao.load({ 1, 3, totalSize, 3 * sizeof(float) }); // color (rgb)
+        } break;
+        case 5:
+        {
+            unsigned int totalSize = 8 * sizeof(float); // pos (3) + color (3) + texture coords (2)
+            vao.load({ 0, 3, totalSize, 0 }); // pos (xyz)
+            vao.load({ 1, 3, totalSize, 3 * sizeof(float) }); // color (rgb)
+            vao.load({ 2, 2, totalSize, 6 * sizeof(float) }); // texture coords (xy)
         } break;
         default: break;
     }

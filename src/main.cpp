@@ -112,7 +112,7 @@ int main()
         if (assetIndex == 3)
         {
             float timeVal = glfwGetTime();
-            float green = (sin(timeVal) / 2.0f) / 0.5f;
+            float green = (sin(5 * timeVal) * 0.35) + 0.65;
             vec4 color = {0.0, green, 0.0, 1.0};
             shader.setVec4("ourColor", color);
         }
