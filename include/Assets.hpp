@@ -16,9 +16,6 @@ struct Asset
     // Indices
     unsigned int* indices;
     unsigned int numIndices;
-
-    // Texture
-    const char* textureFile;
 };
 
 const Asset ASSETS[] = {
@@ -27,48 +24,49 @@ const Asset ASSETS[] = {
         sizeof(TRIANGLE_VERTICES),
         SHADER_FILES[0],
         nullptr,
-        0,
-        nullptr,
+        0
     },
     {
         SQUARE_VERTICES,
         sizeof(SQUARE_VERTICES),
         SHADER_FILES[0],
         SQUARE_INDICES,
-        sizeof(SQUARE_INDICES),
-        nullptr
+        sizeof(SQUARE_INDICES)
     },
     {
         TRIANGLE_VERTICES,
         sizeof(TRIANGLE_VERTICES),
         SHADER_FILES[1],
         nullptr,
-        0,
-        nullptr
+        0
     },
     {
         TRIANGLE_VERTICES,
         sizeof(TRIANGLE_VERTICES),
         SHADER_FILES[2],
         nullptr,
-        0,
-        nullptr
+        0
     },
     {
         COLORED_TRIANGLE_VERTICES,
         sizeof(COLORED_TRIANGLE_VERTICES),
         SHADER_FILES[3],
         nullptr,
-        0,
-        nullptr
+        0
     },
     {
         CONTAINER_VERTICES,
         sizeof(CONTAINER_VERTICES),
         SHADER_FILES[4],
         SQUARE_INDICES,
-        sizeof(SQUARE_INDICES),
-        TEXTURE_FILES[0]
+        sizeof(SQUARE_INDICES)
+    },
+    {
+        CONTAINER_VERTICES,
+        sizeof(CONTAINER_VERTICES),
+        SHADER_FILES[5],
+        SQUARE_INDICES,
+        sizeof(SQUARE_INDICES)
     }
 };
 
@@ -93,6 +91,7 @@ void loadVertexAttributes(int index, VAO& vao)
             vao.load({ 1, 3, totalSize, 3 * sizeof(float) }); // color (rgb)
         } break;
         case 5:
+        case 6:
         {
             unsigned int totalSize = 8 * sizeof(float); // pos (3) + color (3) + texture coords (2)
             vao.load({ 0, 3, totalSize, 0 }); // pos (xyz)
@@ -104,7 +103,7 @@ void loadVertexAttributes(int index, VAO& vao)
 }
 
 
-void loadAsset(unsigned int index, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture)
+void loadAsset(unsigned int index, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader)
 {
     if (index < NUM_ASSETS)
     {
@@ -121,11 +120,5 @@ void loadAsset(unsigned int index, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader,
 
         // Element buffer object
         ebo.load(asset.indices, asset.numIndices);
-
-        // Texture
-        if (asset.textureFile != nullptr)
-        {
-            texture.load(asset.textureFile);
-        }
     }
 }

@@ -8,11 +8,7 @@
 #include "Texture.hpp"
 
 int assetIndex = 0;
-Shader* shaderP;
-Texture* textureP;
-VBO* vboP;
-VAO* vaoP;
-EBO* eboP;
+bool updateAsset = true;
 
 bool polygonMode = false;
 
@@ -35,13 +31,13 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
             {
                 assetIndex++;
                 if (assetIndex >= NUM_ASSETS) assetIndex = 0;
-                loadAsset(assetIndex, *vboP, *vaoP, *eboP, *shaderP, *textureP);
+                updateAsset = true;
             } break;
             case GLFW_KEY_LEFT:
             {
                 assetIndex--;
                 if (assetIndex < 0) assetIndex = (NUM_ASSETS - 1);
-                loadAsset(assetIndex, *vboP, *vaoP, *eboP, *shaderP, *textureP);
+                updateAsset = true;
             } break;
             case GLFW_KEY_TAB:
             {
@@ -77,17 +73,11 @@ int main()
     }
 
     Shader shader;
-    Texture texture;
     VBO vbo;
     VAO vao;
     EBO ebo;
-    loadAsset(assetIndex, vbo, vao, ebo, shader, texture);
-    
-    shaderP = &shader;
-    textureP = &texture;
-    vboP = &vbo;
-    vaoP = &vao;
-    eboP = &ebo;
+    Texture texture;
+    texture.load(TEXTURE_FILES[0]);
 
     // Set user inputs
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -99,12 +89,20 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // Input processing
+        if (updateAsset)
+        {
+            loadAsset(assetIndex, vbo, vao, ebo, shader);
+            updateAsset = false;
+        }
         
         // Rendering
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Textures
-        texture.use();
+        if (assetIndex == 5 || assetIndex == 6)
+        {
+            texture.use();
+        }
 
         // Shaders
         shader.use();
