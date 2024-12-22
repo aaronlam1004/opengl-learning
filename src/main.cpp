@@ -76,8 +76,12 @@ int main()
     VBO vbo;
     VAO vao;
     EBO ebo;
-    Texture texture;
-    texture.load(TEXTURE_FILES[0]);
+    
+    Texture container;
+    container.load(TEXTURE_FILES[0]);
+
+    Texture face;
+    face.load(TEXTURE_FILES[1], true, true);
 
     // Set user inputs
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -99,9 +103,15 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Textures
-        if (assetIndex == 5 || assetIndex == 6)
+        if (assetIndex == 5 || assetIndex == 6 || assetIndex == 7)
         {
-            texture.use();
+            container.use();
+            if (assetIndex == 7)
+            {
+                shader.setInt("containerTexture", 0);
+                shader.setInt("faceTexture", 1);
+                face.use(GL_TEXTURE1);
+            }
         }
 
         // Shaders

@@ -8,8 +8,10 @@ class Texture
     public:
         Texture();
         Texture(const char* textureFile);
-        void load(const char* textureFile);
-        void use();
+        void load(const char* textureFile,
+                  bool hasAlpha = false,
+                  bool flipImage = false);
+        void use(unsigned int textureLocation = GL_TEXTURE0);
     
     private:
         bool loaded = false;

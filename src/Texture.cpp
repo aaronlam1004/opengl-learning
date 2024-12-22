@@ -22,23 +22,25 @@ Texture::Texture(const char* textureFile) :
 //
 //  @param[in] textureFile
 //
-void Texture::load(const char* textureFile)
+void Texture::load(const char* textureFile, bool hasAlpha, bool flipImage)
 {
+    stbi_set_flip_vertically_on_load(flipImage);
     data = stbi_load(textureFile, &width, &height, &numChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        unsigned int format = hasAlpha ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
         stbi_image_free(data);
     }
     loaded = true;
 }
 
-void Texture::use()
+void Texture::use(unsigned int textureLocation)
 {
     if (loaded)
     {
-        // glActiveTexture(0);
+        glActiveTexture(textureLocation);
         glBindTexture(GL_TEXTURE_2D, id);
     }
 }
