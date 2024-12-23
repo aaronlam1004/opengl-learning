@@ -76,9 +76,16 @@ const Asset ASSETS[] = {
         sizeof(SQUARE_INDICES)
     },
     {
-        CONTAINER_VERTICES,
-        sizeof(CONTAINER_VERTICES),
+        TEXTURED_CONTAINER_VERTICES,
+        sizeof(TEXTURED_CONTAINER_VERTICES),
         SHADER_FILES[7],
+        SQUARE_INDICES,
+        sizeof(SQUARE_INDICES)
+    },
+    {
+        TEXTURED_CONTAINER_VERTICES,
+        sizeof(TEXTURED_CONTAINER_VERTICES),
+        SHADER_FILES[8],
         SQUARE_INDICES,
         sizeof(SQUARE_INDICES)
     }
@@ -107,12 +114,18 @@ void loadVertexAttributes(int index, VAO& vao)
         case 5:
         case 6:
         case 7:
-        case 8:
         {
             unsigned int totalSize = 8 * sizeof(float); // pos (3) + color (3) + texture coords (2)
             vao.load({ 0, 3, totalSize, 0 }); // pos (xyz)
             vao.load({ 1, 3, totalSize, 3 * sizeof(float) }); // color (rgb)
             vao.load({ 2, 2, totalSize, 6 * sizeof(float) }); // texture coords (xy)
+        } break;
+        case 8:
+        case 9:
+        {
+            unsigned int totalSize = 5 * sizeof(float); // pos (3) + texture coords (2)
+            vao.load({ 0, 3, totalSize, 0 }); // pos (xyz)
+            vao.load({ 1, 2, totalSize, 3 * sizeof(float) }); // texture coords (xy)
         } break;
         default: break;
     }

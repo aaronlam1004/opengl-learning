@@ -105,10 +105,10 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Textures
-        if (assetIndex == 5 || assetIndex == 6 || assetIndex == 7 || assetIndex == 8)
+        if (assetIndex >= 5 && assetIndex <= 9)
         {
             container.use();
-            if (assetIndex == 7 || assetIndex == 8)
+            if (assetIndex >= 7 && assetIndex <= 9)
             {
                 shader.setInt("containerTexture", 0);
                 shader.setInt("faceTexture", 1);
@@ -116,7 +116,8 @@ int main()
             }
         }
 
-
+        // Shaders
+        shader.use();
         if (assetIndex == 8)
         {
             glm::mat4 transform = glm::mat4(1.0f);
@@ -125,9 +126,22 @@ int main()
             transform = glm::rotate(transform, (float) glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
             shader.setMat4("transform", transform);
         }
+        else if (assetIndex == 9)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, (float) glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+            
+            glm::mat4 view = glm::mat4(1.0f);
+            view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+            
+            glm::mat4 projection = glm::mat4(1.0f);
+            projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
-        // Shaders
-        shader.use();
+            shader.setMat4("model", model);
+            shader.setMat4("view", view);
+            shader.setMat4("projection", projection);
+        }
 
         if (assetIndex == 3)
         {
