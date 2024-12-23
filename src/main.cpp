@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Assets.hpp"
 #include "Buffers.hpp"
@@ -103,15 +105,25 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Textures
-        if (assetIndex == 5 || assetIndex == 6 || assetIndex == 7)
+        if (assetIndex == 5 || assetIndex == 6 || assetIndex == 7 || assetIndex == 8)
         {
             container.use();
-            if (assetIndex == 7)
+            if (assetIndex == 7 || assetIndex == 8)
             {
                 shader.setInt("containerTexture", 0);
                 shader.setInt("faceTexture", 1);
                 face.use(GL_TEXTURE1);
             }
+        }
+
+
+        if (assetIndex == 8)
+        {
+            glm::mat4 transform = glm::mat4(1.0f);
+            transform = glm::scale(transform, glm::vec3(0.5f, 0.5f, 0.5f));
+            transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+            transform = glm::rotate(transform, (float) glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+            shader.setMat4("transform", transform);
         }
 
         // Shaders

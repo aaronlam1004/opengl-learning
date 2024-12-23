@@ -42,9 +42,26 @@ void Shader::setInt(const char* varName, int value)
 //
 //
 //
+void Shader::setVec3(const char* varName, vec3 vec)
+{
+    glUniform3f(findVar(varName), vec[0], vec[1], vec[2]);
+}
+
+//
+//
+//
 void Shader::setVec4(const char* varName, vec4 vec)
 {
     glUniform4f(findVar(varName), vec[0], vec[1], vec[2], vec[3]);
+}
+
+//
+//
+//
+void Shader::setMat4(const char* varName, glm::mat4 mat, bool transpose)
+{
+    bool transposeMat = transpose ? GL_TRUE : GL_FALSE;
+    glUniformMatrix4fv(findVar(varName), 1, transposeMat, glm::value_ptr(mat));
 }
 
 //

@@ -41,6 +41,7 @@ const char* SHADER_FILES[][2] = {
     { "shaders/textures/shader.vert", "shaders/textures/shader.frag" },
     { "shaders/color_mask_textures/shader.vert", "shaders/color_mask_textures/shader.frag" },
     { "shaders/textures_combined/shader.vert", "shaders/textures_combined/shader.frag" },
+    { "shaders/transformations/shader.vert", "shaders/transformations/shader.frag" },
 };
 
 const char* TEXTURE_FILES[] = {

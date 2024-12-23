@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 typedef float vec4[4];
 typedef float vec3[3];
@@ -17,7 +19,9 @@ class Shader
         void use();
 
         void setInt(const char* varName, int value);
+        void setVec3(const char* varName, vec3 vec);
         void setVec4(const char* varName, vec4 vec);
+        void setMat4(const char* varName, glm::mat4 mat, bool transpose = false);
 
     private:
         void loadVertexShader(const char* vertexShaderFile);
