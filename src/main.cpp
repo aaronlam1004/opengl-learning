@@ -4,12 +4,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Assets.hpp"
+#include "Graphics.hpp"
 #include "Buffers.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 
-int assetIndex = 0;
+int graphicIndex = 0;
 bool updateAsset = true;
 
 bool polygonMode = false;
@@ -31,14 +31,14 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
             } break;
             case GLFW_KEY_RIGHT:
             {
-                assetIndex++;
-                if (assetIndex >= NUM_ASSETS) assetIndex = 0;
+                graphicIndex++;
+                if (graphicIndex >= NUM_GRAPHICS) graphicIndex = 0;
                 updateAsset = true;
             } break;
             case GLFW_KEY_LEFT:
             {
-                assetIndex--;
-                if (assetIndex < 0) assetIndex = (NUM_ASSETS - 1);
+                graphicIndex--;
+                if (graphicIndex < 0) graphicIndex = (NUM_GRAPHICS - 1);
                 updateAsset = true;
             } break;
             case GLFW_KEY_TAB:
@@ -52,6 +52,8 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
     }
 }
 
+
+Graphic* graphic;
 int main()
 {
     if (!glfwInit())
@@ -68,6 +70,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
         printf("Failed to initialize GLAD\n");
@@ -91,73 +94,53 @@ int main()
 
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    
+   
     while (!glfwWindowShouldClose(window))
     {
         // Input processing
         if (updateAsset)
         {
-            loadAsset(assetIndex, vbo, vao, ebo, shader);
+            graphic = loadGraphic(graphicIndex, vbo, vao, ebo, shader);
             updateAsset = false;
         }
         
-        // Rendering
+        if (graphic->enableZBuffer)
+        {
+            // Enable z-buffer (depth buffer)
+            glEnable(GL_DEPTH_TEST);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
+        else
+        {
+            glDisable(GL_DEPTH_TEST);
+            glClear(GL_COLOR_BUFFER_BIT);
+        }
+        
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Textures
-        if (assetIndex >= 5 && assetIndex <= 9)
+        if (graphic->addTextures != nullptr)
         {
-            container.use();
-            if (assetIndex >= 7 && assetIndex <= 9)
-            {
-                shader.setInt("containerTexture", 0);
-                shader.setInt("faceTexture", 1);
-                face.use(GL_TEXTURE1);
-            }
+            Texture textures[] = {
+                container, face
+            };
+            graphic->addTextures(shader, textures);
         }
 
         // Shaders
         shader.use();
-        if (assetIndex == 8)
+        if (graphic->update != nullptr)
         {
-            glm::mat4 transform = glm::mat4(1.0f);
-            transform = glm::scale(transform, glm::vec3(0.5f, 0.5f, 0.5f));
-            transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-            transform = glm::rotate(transform, (float) glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
-            shader.setMat4("transform", transform);
-        }
-        else if (assetIndex == 9)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, (float) glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-            
-            glm::mat4 view = glm::mat4(1.0f);
-            view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-            
-            glm::mat4 projection = glm::mat4(1.0f);
-            projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-            shader.setMat4("model", model);
-            shader.setMat4("view", view);
-            shader.setMat4("projection", projection);
-        }
-
-        if (assetIndex == 3)
-        {
-            float timeVal = glfwGetTime();
-            float green = (sin(5 * timeVal) * 0.35) + 0.65;
-            vec4 color = {0.0, green, 0.0, 1.0};
-            shader.setVec4("ourColor", color);
+            graphic->update(shader);
         }
 
         if (ebo.isLoaded())
         {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, graphic->numVertexPoints, GL_UNSIGNED_INT, 0);
         }
         else
         {
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDrawArrays(GL_TRIANGLES, 0, graphic->numVertexPoints);
         }
         
         // Event handling and buffer swapping
