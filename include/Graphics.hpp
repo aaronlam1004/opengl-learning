@@ -164,6 +164,18 @@ const Graphic GRAPHICS[] = {
         addMixedContainerTextures,
         updateContainerCubeRotation,
         true
+    },
+    {
+        TEXTURED_CUBE_VERTICES,
+        sizeof(TEXTURED_CUBE_VERTICES),
+        { 3, 2 }, // aPos(xyz), aTexCoord(xy)
+        36, // (6 sides == 6 squares == 12 triangles == 36 points)
+        SHADER_FILES[8],
+        nullptr,
+        0,
+        addMixedContainerTextures,
+        updateContainerCubeRotation,
+        true
     }
 };
 

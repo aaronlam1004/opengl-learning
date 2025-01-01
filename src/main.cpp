@@ -134,7 +134,20 @@ int main()
             graphic->update(shader);
         }
 
-        if (ebo.isLoaded())
+        if (graphicIndex == 11)
+        {
+            for (int i = 0; i < 10; ++i)
+            {
+                glm::vec3 position = CUBE_POSITIONS[i];
+                glm::mat4 model = glm::mat4(1.0f);
+                float angle = 20.0f * i;
+                model = glm::translate(model, position);
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 3.0f, 0.5f));
+                shader.setMat4("model", model);
+                glDrawArrays(GL_TRIANGLES, 0, graphic->numVertexPoints);
+            }
+        }
+        else if (ebo.isLoaded())
         {
             glDrawElements(GL_TRIANGLES, graphic->numVertexPoints, GL_UNSIGNED_INT, 0);
         }
