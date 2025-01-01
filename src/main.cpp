@@ -82,11 +82,8 @@ int main()
     VAO vao;
     EBO ebo;
     
-    Texture container;
-    container.load(TEXTURE_FILES[0]);
-
-    Texture face;
-    face.load(TEXTURE_FILES[1], true, true);
+    Texture container(TEXTURE_FILES[0]);
+    Texture face(TEXTURE_FILES[1], true, true);
 
     // Set user inputs
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);

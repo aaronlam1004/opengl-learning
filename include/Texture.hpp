@@ -7,7 +7,9 @@ class Texture
 {
     public:
         Texture();
-        Texture(const char* textureFile);
+        Texture(const char* textureFile,
+                bool hasAlpha = false,
+                bool flipImage = false);
         void load(const char* textureFile,
                   bool hasAlpha = false,
                   bool flipImage = false);

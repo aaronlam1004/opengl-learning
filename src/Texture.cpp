@@ -11,10 +11,10 @@ Texture::Texture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-Texture::Texture(const char* textureFile) :
+Texture::Texture(const char* textureFile, bool hasAlpha, bool flipImage) :
     Texture()
 {
-    load(textureFile);
+    load(textureFile, hasAlpha, flipImage);
 }
 
 //
