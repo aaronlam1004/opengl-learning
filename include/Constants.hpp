@@ -3,6 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+static constexpr float WIDTH = 800.0f;
+static constexpr float HEIGHT = 600.0f;
+
 float TRIANGLE_VERTICES[] = {
     // aPos(xyz)
     -0.5f, -0.5f, 0.0f,
@@ -147,7 +150,7 @@ void updateContainerPerspective(Shader& shader)
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
     glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
 
     shader.setMat4("model", model);
     shader.setMat4("view", view);

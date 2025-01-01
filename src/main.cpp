@@ -62,7 +62,7 @@ int main()
         return -1;
     }
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL", NULL, NULL);
     if (window == NULL)
     {
         printf("Failed to create GLFW window\n");
@@ -94,7 +94,7 @@ int main()
 
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-   
+    
     while (!glfwWindowShouldClose(window))
     {
         // Input processing
@@ -103,10 +103,10 @@ int main()
             graphic = loadGraphic(graphicIndex, vbo, vao, ebo, shader);
             updateAsset = false;
         }
-        
+
         if (graphic->enableZBuffer)
         {
-            // Enable z-buffer (depth buffer)
+            // Enable 3D
             glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
