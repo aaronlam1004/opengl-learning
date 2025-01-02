@@ -174,7 +174,7 @@ const Graphic GRAPHICS[] = {
         nullptr,
         0,
         addMixedContainerTextures,
-        updateContainerCubeRotation,
+        updateContainerPerspective,
         true
     }
 };

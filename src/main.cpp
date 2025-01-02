@@ -9,18 +9,76 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 
+Graphic* graphic;
 int graphicIndex = 0;
-bool updateAsset = true;
+bool updateGraphic = true;
 
 bool polygonMode = false;
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
+void handleGraphicNavigation(int key, int action)
+{
+    if (action == GLFW_PRESS)
+    {
+        switch (key)
+        {
+            case GLFW_KEY_RIGHT:
+            {
+                graphicIndex++;
+                if (graphicIndex >= NUM_GRAPHICS) graphicIndex = 0;
+                updateGraphic = true;
+            } break;
+            case GLFW_KEY_LEFT:
+            {
+                graphicIndex--;
+                if (graphicIndex < 0) graphicIndex = (NUM_GRAPHICS - 1);
+                updateGraphic = true;
+            } break;
+            default: break;
+        }
+    }
+}
+
+void handleCameraNavigation(int key, int action)
+{
+    const float cameraSpeed = 0.05f;
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    {
+        switch (key)
+        {
+            case GLFW_KEY_W:
+            {
+                cameraPos += cameraSpeed * cameraFront;
+            } break;
+            case GLFW_KEY_S:
+            {
+                cameraPos -= cameraSpeed * cameraFront;
+            } break;
+            case GLFW_KEY_A:
+            {
+                cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            } break;
+            case GLFW_KEY_D:
+            {
+                cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            } break;
+            default: break;
+        }
+    }
+}
+
 void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int mods)
 {
+    handleCameraNavigation(key, action);
+    handleGraphicNavigation(key, action);
     if (action == GLFW_PRESS)
     {
         switch (key)
@@ -28,18 +86,6 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
             case GLFW_KEY_ESCAPE:
             {
                 glfwSetWindowShouldClose(window, true); 
-            } break;
-            case GLFW_KEY_RIGHT:
-            {
-                graphicIndex++;
-                if (graphicIndex >= NUM_GRAPHICS) graphicIndex = 0;
-                updateAsset = true;
-            } break;
-            case GLFW_KEY_LEFT:
-            {
-                graphicIndex--;
-                if (graphicIndex < 0) graphicIndex = (NUM_GRAPHICS - 1);
-                updateAsset = true;
             } break;
             case GLFW_KEY_TAB:
             {
@@ -52,8 +98,6 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
     }
 }
 
-
-Graphic* graphic;
 int main()
 {
     if (!glfwInit())
@@ -77,6 +121,22 @@ int main()
         return -1;
     }
 
+    /*
+    // Camera position
+    glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+
+    // Camera Direction
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraDirection = glm::normalize(cameraPosition - cameraTarget);
+
+    // Camera Right Axis
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 cameraRightAxis = glm::normalize(glm::cross(cameraUp, cameraDirection));
+
+    // Camera Up Axis
+    glm::vec3 cameraUpAxis = glm::cross(cameraDirection, cameraRight);
+    */
+
     Shader shader;
     VBO vbo;
     VAO vao;
@@ -95,10 +155,10 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // Input processing
-        if (updateAsset)
+        if (updateGraphic)
         {
             graphic = loadGraphic(graphicIndex, vbo, vao, ebo, shader);
-            updateAsset = false;
+            updateGraphic = false;
         }
 
         if (graphic->enableZBuffer)
@@ -133,6 +193,23 @@ int main()
 
         if (graphicIndex == 11)
         {
+            const float radius = 10;
+            float camX = sin(glfwGetTime()) * radius;
+            float camZ = cos(glfwGetTime()) * radius;
+            glm::mat4 view = glm::mat4(1.0f);
+            /*
+            view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),  // Start
+                               glm::vec3(0.0f, 0.0f, 0.0f),  // Target
+                               glm::vec3(0.0f, 1.0f, 0.0f)); // Up
+            */
+            /*
+            view = glm::lookAt(glm::vec3(camX, 0.0, camZ),
+                               glm::vec3(0.0f, 0.0f, 0.0f),
+                               glm::vec3(0.0f, 1.0f, 0.0f));
+            */
+            view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+            shader.setMat4("view", view);
+
             for (int i = 0; i < 10; ++i)
             {
                 glm::vec3 position = CUBE_POSITIONS[i];
