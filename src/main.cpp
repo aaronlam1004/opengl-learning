@@ -19,6 +19,9 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -49,7 +52,7 @@ void handleGraphicNavigation(int key, int action)
 
 void handleCameraNavigation(int key, int action)
 {
-    const float cameraSpeed = 0.05f;
+    float cameraSpeed = 60.0f * deltaTime;
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         switch (key)
@@ -161,6 +164,11 @@ int main()
             updateGraphic = false;
         }
 
+        // Calculate delta time
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         if (graphic->enableZBuffer)
         {
             // Enable 3D
@@ -191,43 +199,27 @@ int main()
             graphic->update(shader);
         }
 
+        // Camera
+        glm::mat4 view = glm::mat4(1.0f);
         if (graphicIndex == 11)
         {
             const float radius = 10;
             float camX = sin(glfwGetTime()) * radius;
             float camZ = cos(glfwGetTime()) * radius;
-            glm::mat4 view = glm::mat4(1.0f);
-            /*
-            view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),  // Start
-                               glm::vec3(0.0f, 0.0f, 0.0f),  // Target
-                               glm::vec3(0.0f, 1.0f, 0.0f)); // Up
-            */
-            /*
             view = glm::lookAt(glm::vec3(camX, 0.0, camZ),
                                glm::vec3(0.0f, 0.0f, 0.0f),
                                glm::vec3(0.0f, 1.0f, 0.0f));
-            */
-            view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-            shader.setMat4("view", view);
-
-            for (int i = 0; i < 10; ++i)
-            {
-                glm::vec3 position = CUBE_POSITIONS[i];
-                glm::mat4 model = glm::mat4(1.0f);
-                float angle = 20.0f * i;
-                model = glm::translate(model, position);
-                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 3.0f, 0.5f));
-                shader.setMat4("model", model);
-                glDrawArrays(GL_TRIANGLES, 0, graphic->numVertexPoints);
-            }
-        }
-        else if (ebo.isLoaded())
-        {
-            glDrawElements(GL_TRIANGLES, graphic->numVertexPoints, GL_UNSIGNED_INT, 0);
         }
         else
         {
-            glDrawArrays(GL_TRIANGLES, 0, graphic->numVertexPoints);
+            view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        }
+        shader.setMat4("view", view);
+        
+        // Draw
+        if (graphic->draw != nullptr)
+        {
+            graphic->draw(graphic, shader);
         }
         
         // Event handling and buffer swapping

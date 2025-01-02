@@ -4,34 +4,6 @@
 #include "Constants.hpp"
 #include <iostream>
 
-#define MAX_NUM_ATTRIBUTES 3
-#define MAX_NUM_TEXTURES 2
-
-struct Graphic
-{
-    // Vertices
-    float* vertices;
-    unsigned int numVertices;
-    unsigned int attributesPerVertex[MAX_NUM_ATTRIBUTES] = {0};
-    unsigned int numVertexPoints;
-
-    // Shader
-    const char** shaderFiles;
-
-    // Indices
-    unsigned int* indices;
-    unsigned int numIndices;
-
-    // Textures
-    void (*addTextures)(Shader& shader, Texture* textures);
-
-    // Update
-    void (*update)(Shader& shader);
-
-    // Depth z-buffer
-    bool enableZBuffer;
-};
-
 const Graphic GRAPHICS[] = {
     {
         TRIANGLE_VERTICES,
@@ -43,7 +15,8 @@ const Graphic GRAPHICS[] = {
         0,
         nullptr,
         nullptr,
-        false
+        false,
+        draw
     },
     {
         SQUARE_VERTICES,
@@ -55,7 +28,8 @@ const Graphic GRAPHICS[] = {
         sizeof(SQUARE_INDICES),
         nullptr,
         nullptr,
-        false
+        false,
+        drawEBO
     },
     {
         TRIANGLE_VERTICES,
@@ -67,7 +41,8 @@ const Graphic GRAPHICS[] = {
         0,
         nullptr,
         nullptr,
-        false
+        false,
+        draw
     },
     {
         TRIANGLE_VERTICES,
@@ -79,7 +54,8 @@ const Graphic GRAPHICS[] = {
         0,
         nullptr,
         updateGreenTriangle,
-        false
+        false,
+        draw
     },
     {
         COLORED_TRIANGLE_VERTICES,
@@ -91,7 +67,8 @@ const Graphic GRAPHICS[] = {
         0,
         nullptr,
         nullptr,
-        false
+        false,
+        draw
     },
     {
         CONTAINER_VERTICES,
@@ -103,7 +80,8 @@ const Graphic GRAPHICS[] = {
         sizeof(SQUARE_INDICES),
         addBaseContainerTexture,
         nullptr,
-        false
+        false,
+        drawEBO
     },
     {
         CONTAINER_VERTICES,
@@ -115,7 +93,8 @@ const Graphic GRAPHICS[] = {
         sizeof(SQUARE_INDICES),
         addBaseContainerTexture,
         nullptr,
-        false
+        false,
+        drawEBO
     },
     {
         CONTAINER_VERTICES,
@@ -127,7 +106,8 @@ const Graphic GRAPHICS[] = {
         sizeof(SQUARE_INDICES),
         addBaseContainerTexture,
         nullptr,
-        false
+        false,
+        drawEBO
     },
     {
         TEXTURED_CONTAINER_VERTICES,
@@ -139,7 +119,8 @@ const Graphic GRAPHICS[] = {
         sizeof(SQUARE_INDICES),
         addMixedContainerTextures,
         updateContainerRotate,
-        false
+        false,
+        drawEBO
     },
     {
         TEXTURED_CONTAINER_VERTICES,
@@ -151,7 +132,8 @@ const Graphic GRAPHICS[] = {
         sizeof(SQUARE_INDICES),
         addMixedContainerTextures,
         updateContainerPerspective,
-        false
+        false,
+        drawEBO
     },
     {
         TEXTURED_CUBE_VERTICES,
@@ -163,7 +145,8 @@ const Graphic GRAPHICS[] = {
         0,
         addMixedContainerTextures,
         updateContainerCubeRotation,
-        true
+        true,
+        draw
     },
     {
         TEXTURED_CUBE_VERTICES,
@@ -175,7 +158,21 @@ const Graphic GRAPHICS[] = {
         0,
         addMixedContainerTextures,
         updateContainerPerspective,
-        true
+        true,
+        drawMultiple
+    },
+    {
+        TEXTURED_CUBE_VERTICES,
+        sizeof(TEXTURED_CUBE_VERTICES),
+        { 3, 2 }, // aPos(xyz), aTexCoord(xy)
+        36, // (6 sides == 6 squares == 12 triangles == 36 points)
+        SHADER_FILES[8],
+        nullptr,
+        0,
+        addMixedContainerTextures,
+        updateContainerPerspective,
+        true,
+        drawMultiple
     }
 };
 

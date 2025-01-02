@@ -3,8 +3,38 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+static constexpr unsigned int MAX_NUM_ATTRIBUTES = 3;
+static constexpr unsigned int MAX_NUM_TEXTURES = 2;
 static constexpr float WIDTH = 800.0f;
 static constexpr float HEIGHT = 600.0f;
+
+struct Graphic
+{
+    // Vertices
+    float* vertices;
+    unsigned int numVertices;
+    unsigned int attributesPerVertex[MAX_NUM_ATTRIBUTES] = {0};
+    unsigned int numVertexPoints;
+
+    // Shader
+    const char** shaderFiles;
+
+    // Indices
+    unsigned int* indices;
+    unsigned int numIndices;
+
+    // Textures
+    void (*addTextures)(Shader& shader, Texture* textures);    
+
+    // Update
+    void (*update)(Shader& shader);
+
+    // Depth z-buffer
+    bool enableZBuffer;
+
+    // Draw
+    void (*draw)(Graphic* graphic, Shader& shader);
+};
 
 float TRIANGLE_VERTICES[] = {
     // aPos(xyz)
@@ -176,4 +206,29 @@ void updateContainerCubeRotation(Shader& shader)
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, (float) glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f, 1.0f, 0.0f));
     shader.setMat4("model", model);
+}
+
+void draw(Graphic* graphic, Shader& shader)
+{
+    glDrawArrays(GL_TRIANGLES, 0, graphic->numVertexPoints);
+}
+
+
+void drawEBO(Graphic* graphic, Shader& shader)
+{
+    glDrawElements(GL_TRIANGLES, graphic->numVertexPoints, GL_UNSIGNED_INT, 0);
+}
+
+void drawMultiple(Graphic* graphic, Shader& shader)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        glm::vec3 position = CUBE_POSITIONS[i];
+        glm::mat4 model = glm::mat4(1.0f);
+        float angle = 20.0f * i;
+        model = glm::translate(model, position);
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 3.0f, 0.5f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, graphic->numVertexPoints);
+    }
 }
