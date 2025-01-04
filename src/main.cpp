@@ -22,6 +22,9 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+float yaw = -90.0f;
+float pitch = 0.0f;
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -52,7 +55,7 @@ void handleGraphicNavigation(int key, int action)
 
 void handleCameraNavigation(int key, int action)
 {
-    float cameraSpeed = 60.0f * deltaTime;
+    float cameraSpeed = 300.0f * deltaTime;
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         switch (key)
@@ -101,6 +104,51 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
     }
 }
 
+const float MOUSE_SENSITIVITY = 0.1f;
+float lastX = WIDTH / 2;
+float lastY = HEIGHT / 2;
+void processMousePosCallback(GLFWwindow* window, double xPos, double yPos)
+{   
+    float xOffset = (xPos - lastX) * MOUSE_SENSITIVITY;
+    float yOffset = (yPos - lastY) * MOUSE_SENSITIVITY;
+    
+    lastX = xPos;
+    lastY = yPos;
+
+    yaw += xOffset;
+    pitch += yOffset;
+
+    if (pitch > 89.0f)
+    {
+        pitch = 89.0f;
+    }
+    if (pitch < -89.0f)
+    {
+        pitch = -89.0f;
+    }
+
+    glm::vec3 direction = glm::vec3(1.0f);
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+}
+
+
+float fov = 45.0f;
+void processMouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+    fov -= (float) yOffset;
+    if (fov < 1.0f)
+    {
+        fov = 1.0f;
+    }
+    if (fov > 45.0f)
+    {
+        fov = 45.0f;
+    }
+}
+
 int main()
 {
     if (!glfwInit())
@@ -117,6 +165,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
@@ -125,6 +174,7 @@ int main()
     }
 
     /*
+    // Manual camera handling
     // Camera position
     glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
 
@@ -151,6 +201,8 @@ int main()
     // Set user inputs
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     glfwSetKeyCallback(window, processKeyPress);
+    glfwSetCursorPosCallback(window, processMousePosCallback);
+    glfwSetScrollCallback(window, processMouseScrollCallback);
 
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -201,6 +253,7 @@ int main()
 
         // Camera
         glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
         if (graphicIndex == 11)
         {
             const float radius = 10;
@@ -209,11 +262,14 @@ int main()
             view = glm::lookAt(glm::vec3(camX, 0.0, camZ),
                                glm::vec3(0.0f, 0.0f, 0.0f),
                                glm::vec3(0.0f, 1.0f, 0.0f));
+            projection = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
         }
         else
         {
             view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+            projection = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 0.1f, 100.0f);
         }
+        shader.setMat4("projection", projection);
         shader.setMat4("view", view);
         
         // Draw
