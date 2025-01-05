@@ -7,6 +7,7 @@ set SRCS=%SRCS% %SRC_DIR%/glad.c
 set SRCS=%SRCS% %SRC_DIR%/Buffers.cpp
 set SRCS=%SRCS% %SRC_DIR%/Shader.cpp
 set SRCS=%SRCS% %SRC_DIR%/Texture.cpp
+set SRCS=%SRCS% %SRC_DIR%/ManualCamera.cpp
 
 rem includes
 set INCLUDE_DIR=../include

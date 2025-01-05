@@ -8,6 +8,7 @@
 #include "Buffers.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include "ManualCamera.hpp"
 
 Graphic* graphic;
 int graphicIndex = 0;
@@ -149,6 +150,7 @@ void processMouseScrollCallback(GLFWwindow* window, double xOffset, double yOffs
     }
 }
 
+ManualCamera manualCamera;
 int main()
 {
     if (!glfwInit())
@@ -173,23 +175,6 @@ int main()
         return -1;
     }
 
-    /*
-    // Manual camera handling
-    // Camera position
-    glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-
-    // Camera Direction
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraDirection = glm::normalize(cameraPosition - cameraTarget);
-
-    // Camera Right Axis
-    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 cameraRightAxis = glm::normalize(glm::cross(cameraUp, cameraDirection));
-
-    // Camera Up Axis
-    glm::vec3 cameraUpAxis = glm::cross(cameraDirection, cameraRight);
-    */
-
     Shader shader;
     VBO vbo;
     VAO vao;
@@ -206,6 +191,10 @@ int main()
 
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    // Set manual camera
+    manualCamera.setTarget(glm::vec3(0.0f, 0.0f, 0.0f));
+    manualCamera.setUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
     
     while (!glfwWindowShouldClose(window))
     {
@@ -259,18 +248,19 @@ int main()
             const float radius = 10;
             float camX = sin(glfwGetTime()) * radius;
             float camZ = cos(glfwGetTime()) * radius;
-            view = glm::lookAt(glm::vec3(camX, 0.0, camZ),
-                               glm::vec3(0.0f, 0.0f, 0.0f),
-                               glm::vec3(0.0f, 1.0f, 0.0f));
             projection = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
+            shader.setMat4("projection", projection);
+
+            manualCamera.setPosition(glm::vec3(camX, 0.0f, camZ));
+            manualCamera.updateView(shader);
         }
         else
         {
             view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
             projection = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 0.1f, 100.0f);
+            shader.setMat4("projection", projection);
+            shader.setMat4("view", view);
         }
-        shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
         
         // Draw
         if (graphic->draw != nullptr)
