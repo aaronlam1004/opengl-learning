@@ -28,13 +28,13 @@ VAO::VAO()
 void VAO::load(const VertexAttribute& attribute)
 {
     glBindVertexArray(id);
-    glVertexAttribPointer(attribute.location,
+    glVertexAttribPointer(attribute.index,
                           attribute.numValues,
                           GL_FLOAT,
                           GL_FALSE,
                           attribute.totalSize,
                           (void*) attribute.start);
-    glEnableVertexAttribArray(attribute.location);
+    glEnableVertexAttribArray(attribute.index);
 }
 
 void VAO::del()

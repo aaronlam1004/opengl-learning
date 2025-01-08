@@ -20,7 +20,7 @@ class VAO
     public:
         struct VertexAttribute
         {
-            unsigned int location;
+            unsigned int index;
             unsigned int numValues;
             unsigned int totalSize;
             unsigned int start;
