@@ -2,7 +2,14 @@
 
 struct CameraProperties
 {
-    glm::vec3 position;
-    glm::vec3 target;
-    glm::vec3 upVector;
+    // Location
+    glm::vec3 position; // Camera position
+    glm::vec3 target;   // Target positiion
+    glm::vec3 up;       // Orientation of "up" direction of camera
+
+    // View
+    glm::vec3 front;    // Front of camera position
+    float yaw;          // Yaw
+    float pitch;        // Pitch
+    float fov;          // Field of view
 };

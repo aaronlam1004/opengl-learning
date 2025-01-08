@@ -8,7 +8,7 @@
 #include "Buffers.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
-#include "ManualCamera.hpp"
+#include "Camera.hpp"
 
 Graphic* graphic;
 int graphicIndex = 0;
@@ -16,9 +16,7 @@ bool updateGraphic = true;
 
 bool polygonMode = false;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -56,26 +54,34 @@ void handleGraphicNavigation(int key, int action)
 
 void handleCameraNavigation(int key, int action)
 {
-    float cameraSpeed = 300.0f * deltaTime;
+    float cameraSpeed = 100.0f * deltaTime;
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         switch (key)
         {
             case GLFW_KEY_W:
             {
-                cameraPos += cameraSpeed * cameraFront;
+                camera.updatePosition(-cameraSpeed, 'y');
             } break;
             case GLFW_KEY_S:
             {
-                cameraPos -= cameraSpeed * cameraFront;
+                camera.updatePosition(cameraSpeed, 'y');
             } break;
             case GLFW_KEY_A:
             {
-                cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+                camera.updatePosition(-cameraSpeed, 'x');
             } break;
             case GLFW_KEY_D:
             {
-                cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+                camera.updatePosition(cameraSpeed, 'x');
+            } break;
+            case GLFW_KEY_Q:
+            {
+                camera.updatePosition(-cameraSpeed, 'z');
+            } break;
+            case GLFW_KEY_E:
+            {
+                camera.updatePosition(cameraSpeed, 'z');
             } break;
             default: break;
         }
@@ -132,7 +138,7 @@ void processMousePosCallback(GLFWwindow* window, double xPos, double yPos)
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
+    // cameraFront = glm::normalize(direction);
 }
 
 
@@ -150,7 +156,6 @@ void processMouseScrollCallback(GLFWwindow* window, double xOffset, double yOffs
     }
 }
 
-ManualCamera manualCamera;
 int main()
 {
     if (!glfwInit())
@@ -186,15 +191,11 @@ int main()
     // Set user inputs
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     glfwSetKeyCallback(window, processKeyPress);
-    glfwSetCursorPosCallback(window, processMousePosCallback);
-    glfwSetScrollCallback(window, processMouseScrollCallback);
+    // glfwSetCursorPosCallback(window, processMousePosCallback);
+    // glfwSetScrollCallback(window, processMouseScrollCallback);
 
     // Set clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-    // Set manual camera
-    manualCamera.setTarget(glm::vec3(0.0f, 0.0f, 0.0f));
-    manualCamera.setUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
     
     while (!glfwWindowShouldClose(window))
     {
@@ -251,15 +252,14 @@ int main()
             projection = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
             shader.setMat4("projection", projection);
 
-            manualCamera.setPosition(glm::vec3(camX, 0.0f, camZ));
-            manualCamera.updateView(shader);
+            camera.setTempView(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), shader);
         }
         else
         {
-            view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+            camera.setCamera(shader);
+            
             projection = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 0.1f, 100.0f);
             shader.setMat4("projection", projection);
-            shader.setMat4("view", view);
         }
         
         // Draw
