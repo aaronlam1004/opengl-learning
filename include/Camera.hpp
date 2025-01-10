@@ -15,10 +15,12 @@ class Camera
         void setFront(glm::vec3 front);
 
         void updatePosition(float delta, char axis);
-        void updateFront(float delta);
+        void updateAngle(float deltaX, float deltaY);
+        void updateZoom(float deltaZ);
     
-        void setTempView(glm::vec3 position, glm::vec3 target, Shader& shader);
-        void setCamera(Shader& shader);
+        void setTempView(Shader& shader, glm::vec3 position, glm::vec3 target);
+        void setTempPerspective(Shader& shader, float fov, float width, float height);
+        void setCamera(Shader& shader, float width, float height);
 
     protected:
         glm::mat4 getLookAt(glm::vec3 position, glm::vec3 target);

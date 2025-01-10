@@ -53,12 +53,45 @@ void Camera::updatePosition(float delta, char axis)
         } break;
         default: break;
     }
-    cameraProperties.target = cameraProperties.position + cameraProperties.front;
 }
 
-void Camera::updateFront(float delta)
+void Camera::updateAngle(float deltaX, float deltaY)
 {
-    // cameraProperties.front += delta;
+    float pitch = cameraProperties.pitch;
+    pitch += deltaY;
+    if (pitch > 89.0f)
+    {
+        pitch = 89.0f;
+    }
+    else if (pitch < -89.0f)
+    {
+        pitch = -89.0f;
+    }
+    cameraProperties.pitch = pitch;
+    
+    cameraProperties.yaw += deltaX;
+    float yaw = cameraProperties.yaw;
+
+    glm::vec3 direction = glm::vec3(1.0f);
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraProperties.front = glm::normalize(direction);
+}
+
+void Camera::updateZoom(float deltaZ)
+{
+    float fov = cameraProperties.fov;
+    fov -= deltaZ;
+    if (fov < 1.0f)
+    {
+        fov = 1.0f;
+    }
+    else if (fov > 45.0f)
+    {
+        fov = 45.0f;
+    }
+    cameraProperties.fov = fov;
 }
 
 glm::mat4 Camera::getLookAt(glm::vec3 position, glm::vec3 target)
@@ -83,22 +116,31 @@ glm::mat4 Camera::getLookAt(glm::vec3 position, glm::vec3 target)
     glm::vec3 translateVector = glm::vec3(-position[0], -position[1], -position[2]);
     lookAt = glm::translate(cameraMat, translateVector);
 #else
-    lookAt = glm::lookAt(cameraProperties.position,
-                         cameraProperties.target,
+    lookAt = glm::lookAt(position,
+                         target,
                          cameraProperties.up);
 #endif
     return lookAt;
 }
 
-void Camera::setTempView(glm::vec3 position, glm::vec3 target, Shader& shader)
+void Camera::setTempView(Shader& shader, glm::vec3 position, glm::vec3 target)
 {
     glm::mat4 lookAt = getLookAt(position, target);
     shader.setMat4("view", lookAt);
 }
 
-
-void Camera::setCamera(Shader& shader)
+void Camera::setTempPerspective(Shader& shader, float fov, float width, float height)
 {
+    glm::mat4 projection = glm::perspective(fov, width / height, 0.1f, 100.0f);
+    shader.setMat4("projection", projection);
+}
+
+void Camera::setCamera(Shader& shader, float width, float height)
+{
+    cameraProperties.target = cameraProperties.position + cameraProperties.front;
     glm::mat4 lookAt = getLookAt(cameraProperties.position, cameraProperties.target);
     shader.setMat4("view", lookAt);
+
+    glm::mat4 projection = glm::perspective(glm::radians(cameraProperties.fov), width / height, 0.1f, 100.0f);
+    shader.setMat4("projection", projection);
 }
