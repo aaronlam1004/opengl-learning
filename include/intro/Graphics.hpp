@@ -1,8 +1,7 @@
 #include "Buffers.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
-#include "Constants.hpp"
-#include <iostream>
+#include <intro/Constants.hpp>
 
 const Graphic GRAPHICS[] = {
     {

@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Graphics.hpp"
+#include <intro/Graphics.hpp>
 #include "Buffers.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -139,7 +139,7 @@ int main()
         return -1;
     }
 
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL [Intro]", NULL, NULL);
     if (window == NULL)
     {
         printf("Failed to create GLFW window\n");

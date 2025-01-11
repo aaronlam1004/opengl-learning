@@ -2,7 +2,15 @@
 
 rem sources
 set SRC_DIR=../src
-set SRCS=%SRC_DIR%/main.cpp
+
+if "%1%"=="lighting" (
+    echo == BUILDING [%1%] ==
+    set SRCS=%SRC_DIR%/lighting/main.cpp
+) else (
+    echo == BUILDING [intro] ==
+    set SRCS=%SRC_DIR%/intro/main.cpp
+)
+
 set SRCS=%SRCS% %SRC_DIR%/glad.c
 set SRCS=%SRCS% %SRC_DIR%/Buffers.cpp
 set SRCS=%SRCS% %SRC_DIR%/Shader.cpp
@@ -17,9 +25,12 @@ set LIB_DIR=../lib
 set LIBS=opengl32.lib %LIB_DIR%/glfw3dll.lib
 
 rem debug
-if "%1%"=="nonabstract" (
-   echo == NON ABSTRACTION ENABLED ==
-   set CPP_NONABSTRACT_FLAGS=/DNONABSTRACT
+set NON_ABSTRACT=F
+if "%1%"=="--nonabstract" set NON_ABSTRACT=T
+if "%2%"=="--nonabstract" set NON_ABSTRACT=T
+if "%NON_ABSTRACT%"=="T" (
+    echo == NON ABSTRACTION ENABLED ==
+    set CPP_NONABSTRACT_FLAGS=/DNONABSTRACT
 )
 
 mkdir build
