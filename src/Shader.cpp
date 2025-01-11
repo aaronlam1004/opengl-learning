@@ -32,7 +32,10 @@ void Shader::use()
 }
 
 //
+//  Set integer for variable in shader
 //
+//  @param[in] varName
+//  @param[in] value
 //
 void Shader::setInt(const char* varName, int value)
 {
@@ -40,7 +43,10 @@ void Shader::setInt(const char* varName, int value)
 }
 
 //
+//  Set vector (3) for variable in shader
 //
+//  @param[in] varName
+//  @param[in] vec
 //
 void Shader::setVec3(const char* varName, vec3 vec)
 {
@@ -48,7 +54,10 @@ void Shader::setVec3(const char* varName, vec3 vec)
 }
 
 //
+//  Set vector (4) for variable in shader
 //
+//  @param[in] varName
+//  @param[in] vec
 //
 void Shader::setVec4(const char* varName, vec4 vec)
 {
@@ -56,7 +65,11 @@ void Shader::setVec4(const char* varName, vec4 vec)
 }
 
 //
+//  Set matrix (4x4) for variable in shader
 //
+//  @param[in] varName
+//  @param[in] mat
+//  @param[in] transpose
 //
 void Shader::setMat4(const char* varName, glm::mat4 mat, bool transpose)
 {
@@ -113,7 +126,7 @@ void Shader::compile()
 }
 
 //
-// Compiles the vertex shader
+//  Compiles the vertex shader
 //
 void Shader::compileVertexShader()
 {
@@ -123,7 +136,7 @@ void Shader::compileVertexShader()
 }
 
 //
-// Compiles the fragment shader
+//  Compiles the fragment shader
 //
 void Shader::compileFragmentShader()
 {
@@ -133,7 +146,9 @@ void Shader::compileFragmentShader()
 }
 
 //
+//  Find variable in shader
 //
+//  @param[in] varName
 //
 int Shader::findVar(const char* varName)
 {

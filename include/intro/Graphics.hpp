@@ -183,9 +183,10 @@ void loadVertexAttributes(unsigned int numAttributesPerVertex[MAX_NUM_ATTRIBUTES
     unsigned int totalSize = 0;
     while (attrIndex < MAX_NUM_ATTRIBUTES && numAttributesPerVertex[attrIndex] != 0)
     {
-        totalSize += numAttributesPerVertex[attrIndex] * sizeof(float);
+        totalSize += numAttributesPerVertex[attrIndex];
         attrIndex++;
     }
+    totalSize *= sizeof(float);
 
     unsigned int start = 0;
     attrIndex = 0;

@@ -4,11 +4,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <intro/Graphics.hpp>
 #include "Buffers.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
+#include <intro/Graphics.hpp>
 
 // Graphic navigation
 Graphic* graphic;
@@ -146,14 +146,15 @@ int main()
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
+    glfwMakeContextCurrent(window);
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
         printf("Failed to initialize GLAD\n");
         return -1;
     }
+
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     Shader shader;
     VBO vbo;
@@ -197,8 +198,6 @@ int main()
             glDisable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT);
         }
-        
-        glClear(GL_COLOR_BUFFER_BIT);
 
         // Textures
         if (graphic->addTextures != nullptr)
@@ -238,8 +237,10 @@ int main()
             graphic->draw(graphic, shader);
         }
         
-        // Event handling and buffer swapping
+        // Buffer swapping
         glfwSwapBuffers(window);
+
+        // Event handling
         glfwPollEvents();
     }
 

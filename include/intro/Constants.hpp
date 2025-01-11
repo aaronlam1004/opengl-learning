@@ -213,7 +213,6 @@ void draw(Graphic* graphic, Shader& shader)
     glDrawArrays(GL_TRIANGLES, 0, graphic->numVertexPoints);
 }
 
-
 void drawEBO(Graphic* graphic, Shader& shader)
 {
     glDrawElements(GL_TRIANGLES, graphic->numVertexPoints, GL_UNSIGNED_INT, 0);
