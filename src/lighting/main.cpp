@@ -21,6 +21,10 @@ struct Entity
     // EBO ebo;
     // Texture* textures;
     unsigned int numVertices;
+
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view  = glm::mat4(1.0f);
+    glm::mat4 proj  = glm::mat4(1.0f);
 };
 
 int main()
@@ -77,32 +81,38 @@ int main()
 
         // Draw cube
         cube.shader.use();
-        
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, -0.5f, -5.0f));
+        vec3 objColor = {1.0f, 0.5f, 0.31f};
+        vec3 lightColor = {1.0f, 1.0f, 1.0f};
+        cube.shader.setVec3("objectColor", objColor);
+        cube.shader.setVec3("lightColor", lightColor);
 
-        glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
+        cube.model = glm::mat4(1.0f);
+        cube.model = glm::translate(cube.model, glm::vec3(-0.5f, 0.0f, 2.0f));
+        cube.model = glm::rotate(cube.model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        cube.view = glm::mat4(1.0f);
+        cube.view = glm::translate(cube.view, glm::vec3(0.0f, 0.0f, -5.0f));
+        cube.proj = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
 
-        cube.shader.setMat4("model", model);
-        cube.shader.setMat4("view", view);
-        cube.shader.setMat4("projection", projection);
+        cube.shader.setMat4("model", cube.model);
+        cube.shader.setMat4("view", cube.view);
+        cube.shader.setMat4("projection", cube.proj);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Draw light
         light.shader.use();
         
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
-        model = glm::scale(model, glm::vec3(0.2f));
+        light.model = glm::mat4(1.0f);
+        light.model = glm::translate(light.model, glm::vec3(1.0f, 1.0f, 2.0f));
+        light.model = glm::scale(light.model, glm::vec3(0.2f));
+        light.view = glm::mat4(1.0f);
+        light.view = glm::translate(light.view, glm::vec3(0.0f, 0.0f, -5.0f));
+        light.proj = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
 
-        light.shader.setMat4("model", model);
-        light.shader.setMat4("view", view);
-        light.shader.setMat4("projection", projection);
+        light.shader.setMat4("model", light.model);
+        light.shader.setMat4("view", light.view);
+        light.shader.setMat4("projection", light.proj);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
