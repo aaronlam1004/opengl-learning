@@ -13,6 +13,84 @@
 static constexpr float WIDTH  = 800;
 static constexpr float HEIGHT = 600;
 
+// Camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+// Keyboard variables
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+// Mouse variables
+const float MOUSE_SENSITIVITY = 0.1f;
+float lastX = WIDTH / 2;
+float lastY = HEIGHT / 2;
+
+void handleCameraNavigation(int key, int action)
+{
+    float cameraSpeed = 100.0f * deltaTime;
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    {
+        switch (key)
+        {
+            case GLFW_KEY_W:
+            {
+                camera.updatePosition(-cameraSpeed, 'y');
+            } break;
+            case GLFW_KEY_S:
+            {
+                camera.updatePosition(cameraSpeed, 'y');
+            } break;
+            case GLFW_KEY_A:
+            {
+                camera.updatePosition(-cameraSpeed, 'x');
+            } break;
+            case GLFW_KEY_D:
+            {
+                camera.updatePosition(cameraSpeed, 'x');
+            } break;
+            case GLFW_KEY_Q:
+            {
+                camera.updatePosition(-cameraSpeed, 'z');
+            } break;
+            case GLFW_KEY_E:
+            {
+                camera.updatePosition(cameraSpeed, 'z');
+            } break;
+            default: break;
+        }
+    }
+}
+
+void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int mods)
+{
+    handleCameraNavigation(key, action);
+    if (action == GLFW_PRESS)
+    {
+        switch (key)
+        {
+            case GLFW_KEY_ESCAPE:
+            {
+                glfwSetWindowShouldClose(window, true); 
+            } break;
+            default: break;
+        }
+    }
+}
+
+void processCursorPosCallback(GLFWwindow* window, double xPos, double yPos)
+{   
+    float xOffset = (xPos - lastX) * MOUSE_SENSITIVITY;
+    float yOffset = (yPos - lastY) * MOUSE_SENSITIVITY;
+    lastX = xPos;
+    lastY = yPos;
+    camera.updateAngle(xOffset, yOffset);
+}
+
+void processMouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+    camera.updateZoom((float) yOffset);
+}
+
 struct Entity
 {
     Shader shader;
@@ -50,12 +128,18 @@ int main()
         return -1;
     }
 
+    // Set user inputs
+    // glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetKeyCallback(window, processKeyPress);
+    glfwSetCursorPosCallback(window, processCursorPosCallback);
+    glfwSetScrollCallback(window, processMouseScrollCallback);
+
     Entity cube;
     Entity light;
 
     // Shader
     cube.shader.load("shaders/colors/shader.vert", "shaders/colors/shader.frag");
-    light.shader.load("shaders/colors/shader.vert", "shaders/colors/lightShader.frag");
+    light.shader.load("shaders/basic_lighting/shader.vert", "shaders/basic_lighting/lightShader.frag");
     
     // Vertex buffer object
     cube.vbo.load(CUBE_VERTICES, sizeof(CUBE_VERTICES));
@@ -76,6 +160,11 @@ int main()
     
     while (!glfwWindowShouldClose(window))
     {
+        // Calculate delta time
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         // Clear screen using clear color
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -88,15 +177,8 @@ int main()
         cube.shader.setVec3("lightColor", lightColor);
 
         cube.model = glm::mat4(1.0f);
-        cube.model = glm::translate(cube.model, glm::vec3(-0.5f, 0.0f, 2.0f));
-        cube.model = glm::rotate(cube.model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        cube.view = glm::mat4(1.0f);
-        cube.view = glm::translate(cube.view, glm::vec3(0.0f, 0.0f, -5.0f));
-        cube.proj = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
-
         cube.shader.setMat4("model", cube.model);
-        cube.shader.setMat4("view", cube.view);
-        cube.shader.setMat4("projection", cube.proj);
+        camera.setCamera(cube.shader, WIDTH, HEIGHT);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -104,15 +186,10 @@ int main()
         light.shader.use();
         
         light.model = glm::mat4(1.0f);
-        light.model = glm::translate(light.model, glm::vec3(1.0f, 1.0f, 2.0f));
+        light.model = glm::translate(light.model, glm::vec3(1.2f, 1.0f, 2.0f));
         light.model = glm::scale(light.model, glm::vec3(0.2f));
-        light.view = glm::mat4(1.0f);
-        light.view = glm::translate(light.view, glm::vec3(0.0f, 0.0f, -5.0f));
-        light.proj = glm::perspective(glm::radians(45.0f), WIDTH / HEIGHT, 0.1f, 100.0f);
-
         light.shader.setMat4("model", light.model);
-        light.shader.setMat4("view", light.view);
-        light.shader.setMat4("projection", light.proj);
+        camera.setCamera(light.shader, WIDTH, HEIGHT);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
