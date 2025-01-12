@@ -133,6 +133,11 @@ void Shader::compileVertexShader()
     const char* vertShader = vertexShader.c_str();
     glShaderSource(vertexShaderID, 1, &vertShader, NULL);
     glCompileShader(vertexShaderID);
+    /*
+    int status;
+    glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &status);
+    printf("VERTEX SHADER COMPILE STATUS: %d\n", status);
+    */
 }
 
 //
@@ -143,6 +148,11 @@ void Shader::compileFragmentShader()
     const char* fragShader = fragmentShader.c_str();
     glShaderSource(fragmentShaderID, 1, &fragShader, NULL);
     glCompileShader(fragmentShaderID);
+    /*
+    int status;
+    glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &status);
+    printf("FRAG SHADER COMPILE STATUS: %d\n", status);
+    */
 }
 
 //

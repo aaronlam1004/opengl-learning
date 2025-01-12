@@ -8,6 +8,7 @@ class VBO
     public:
         VBO();
         void load(const float vertices[], const unsigned int numVertices);
+        void use();
         void del();
 
     private:
@@ -28,6 +29,7 @@ class VAO
     
         VAO();
         void load(const VertexAttribute& attribute);
+        void use();
         void del();
 
     private:
@@ -41,6 +43,7 @@ class EBO
         EBO();
         bool isLoaded();
         void load(const unsigned int indices[], const unsigned int numIndices);
+        void use();
         void del();
     
     private:

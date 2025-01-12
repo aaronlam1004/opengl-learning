@@ -13,6 +13,11 @@ void VBO::load(const float vertices[], const unsigned int numVertices)
     glBufferData(GL_ARRAY_BUFFER, numVertices, vertices, GL_STATIC_DRAW);
 }
 
+void VBO::use()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, id);
+}
+
 void VBO::del()
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -35,6 +40,11 @@ void VAO::load(const VertexAttribute& attribute)
                           attribute.totalSize,
                           (void*) attribute.start);
     glEnableVertexAttribArray(attribute.index);
+}
+
+void VAO::use()
+{
+    glBindVertexArray(id);
 }
 
 void VAO::del()
@@ -62,6 +72,11 @@ void EBO::load(const unsigned int indices[], const unsigned int numIndices)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices, indices, GL_STATIC_DRAW);
         loaded = true;
     }
+}
+
+void EBO::use()
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
 }
 
 void EBO::del()
