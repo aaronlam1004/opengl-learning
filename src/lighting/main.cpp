@@ -21,13 +21,14 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // Mouse variables
+bool firstMouse = false;
 const float MOUSE_SENSITIVITY = 0.1f;
 float lastX = WIDTH / 2;
 float lastY = HEIGHT / 2;
 
 void handleCameraNavigation(int key, int action)
 {
-    float cameraSpeed = 100.0f * deltaTime;
+    float cameraSpeed = 10.0f * deltaTime;
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         switch (key)
@@ -78,7 +79,12 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
 }
 
 void processCursorPosCallback(GLFWwindow* window, double xPos, double yPos)
-{   
+{
+    if (firstMouse)
+    {
+        lastX = xPos;
+        lastY = yPos;
+    }
     float xOffset = (xPos - lastX) * MOUSE_SENSITIVITY;
     float yOffset = (yPos - lastY) * MOUSE_SENSITIVITY;
     lastX = xPos;
@@ -127,6 +133,9 @@ int main()
         printf("Failed to initialize GLAD\n");
         return -1;
     }
+    
+    // Hide mouse cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Set user inputs
     // glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -173,11 +182,12 @@ int main()
 
         vec3 objectColor = {1.0f, 0.5f, 0.31f};
         vec3 lightColor = {1.0f, 1.0f, 1.0f};
-        vec3 lightPos = {1.2f, 1.0f, 2.0f};
+        glm::vec3 lightPos = glm::vec3(0.0f, 2.0f, 0.0f);
 
         cube.shader.setVec3("objectColor", objectColor);
         cube.shader.setVec3("lightColor", lightColor);
-        cube.shader.setVec3("lightPos", lightPos);
+        cube.shader.setGlmVec3("lightPos", lightPos);
+        cube.shader.setGlmVec3("viewPos", camera.properties().position);
 
         cube.model = glm::mat4(1.0f);
         cube.shader.setMat4("model", cube.model);
@@ -190,7 +200,7 @@ int main()
         light.vao.use();
         
         light.model = glm::mat4(1.0f);
-        light.model = glm::translate(light.model, glm::vec3(1.2f, 1.0f, 2.0f));
+        light.model = glm::translate(light.model, lightPos);
         light.model = glm::scale(light.model, glm::vec3(0.2f));
         light.shader.setMat4("model", light.model);
         camera.setCamera(light.shader, WIDTH, HEIGHT);

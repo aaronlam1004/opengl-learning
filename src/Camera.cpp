@@ -8,6 +8,11 @@ Camera::Camera(glm::vec3 position)
     cameraProperties.target = cameraProperties.position + cameraProperties.front;
 }
 
+CameraProperties Camera::properties()
+{
+    return cameraProperties;
+}
+
 void Camera::setPosition(glm::vec3 position)
 {
     cameraProperties.position = position;

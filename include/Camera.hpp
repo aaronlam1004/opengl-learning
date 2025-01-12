@@ -22,6 +22,8 @@ class Camera
         void setTempPerspective(Shader& shader, float fov, float width, float height);
         void setCamera(Shader& shader, float width, float height);
 
+        CameraProperties properties();
+
     protected:
         glm::mat4 getLookAt(glm::vec3 position, glm::vec3 target);
     

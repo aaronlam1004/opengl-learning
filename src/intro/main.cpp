@@ -118,7 +118,13 @@ void processKeyPress(GLFWwindow* window, int key, int scanCode, int action, int 
 }
 
 void processCursorPosCallback(GLFWwindow* window, double xPos, double yPos)
-{   
+{ 
+    if (firstMouse)
+    {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+    }
     float xOffset = (xPos - lastX) * MOUSE_SENSITIVITY;
     float yOffset = (yPos - lastY) * MOUSE_SENSITIVITY;
     lastX = xPos;
@@ -154,7 +160,8 @@ int main()
         return -1;
     }
 
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // Hide mouse cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     Shader shader;
     VBO vbo;

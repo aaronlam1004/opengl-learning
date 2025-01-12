@@ -54,6 +54,17 @@ void Shader::setVec3(const char* varName, vec3 vec)
 }
 
 //
+//  Set vector (3) for variable in shader
+//
+//  @param[in] varName
+//  @param[in] vec
+//
+void Shader::setGlmVec3(const char* varName, glm::vec3 vec)
+{
+    glUniform3fv(findVar(varName), 1, glm::value_ptr(vec));
+}
+
+//
 //  Set vector (4) for variable in shader
 //
 //  @param[in] varName
@@ -62,6 +73,17 @@ void Shader::setVec3(const char* varName, vec3 vec)
 void Shader::setVec4(const char* varName, vec4 vec)
 {
     glUniform4f(findVar(varName), vec[0], vec[1], vec[2], vec[3]);
+}
+
+//
+//  Set vector (4) for variable in shader
+//
+//  @param[in] varName
+//  @param[in] vec
+//
+void Shader::setGlmVec4(const char* varName, glm::vec4 vec)
+{
+    glUniform4fv(findVar(varName), 1, glm::value_ptr(vec));
 }
 
 //
