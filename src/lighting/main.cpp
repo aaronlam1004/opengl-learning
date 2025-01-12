@@ -138,18 +138,21 @@ int main()
     Entity light;
 
     // Shader
-    cube.shader.load("shaders/colors/shader.vert", "shaders/colors/shader.frag");
+    cube.shader.load("shaders/basic_lighting/shader.vert", "shaders/basic_lighting/shader.frag");
     light.shader.load("shaders/basic_lighting/shader.vert", "shaders/basic_lighting/lightShader.frag");
     
     // Vertex buffer object
-    cube.vbo.load(CUBE_VERTICES, sizeof(CUBE_VERTICES));
+    // cube.vbo.load(CUBE_VERTICES, sizeof(CUBE_VERTICES));
+    cube.vbo.load(LIGHTED_CUBE_VERTICES, sizeof(CUBE_VERTICES));
     cube.numVertices = 36;
 
     light.vbo.load(CUBE_VERTICES, sizeof(CUBE_VERTICES));
     light.numVertices = 36;
 
     // Vertex attributes
-    cube.vao.load({ 0, 3, 3 * sizeof(float), 0 });
+    // cube.vao.load({ 0, 3, 3 * sizeof(float), 0 });
+    cube.vao.load({ 0, 3, 6 * sizeof(float), 0 });
+    cube.vao.load({ 1, 3, 6 * sizeof(float), 3 * sizeof(float) });
     light.vao.load({ 0, 3, 3 * sizeof(float), 0 });
 
     // Set clear color
@@ -173,8 +176,11 @@ int main()
 
         vec3 objColor = {1.0f, 0.5f, 0.31f};
         vec3 lightColor = {1.0f, 1.0f, 1.0f};
+        vec3 lightPos = {1.2f, 1.0f, 2.0f};
+
         cube.shader.setVec3("objectColor", objColor);
         cube.shader.setVec3("lightColor", lightColor);
+        cube.shader.setVec3("lightPos", lightPos);
 
         cube.model = glm::mat4(1.0f);
         cube.shader.setMat4("model", cube.model);
