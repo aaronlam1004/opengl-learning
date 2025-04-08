@@ -18,7 +18,7 @@
 Color LIGHT_COLOR { 1.0f, 1.0f, 1.0f };
 Color OBJ_COLOR   { 1.0f, 0.5f, 0.31f };
 
-Pos LIGHT_POS { 0.0f, 2.0f, 0.0f };
+Pos LIGHT_POS { 0.0f, 1.0f, -0.5f };
 Pos OBJ_POS   { 0.0f, 0.0f, 0.0f };
 
 struct EntityData_Scene1
