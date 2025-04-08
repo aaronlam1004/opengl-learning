@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -7,37 +9,29 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-typedef float vec4[4];
-typedef float vec3[3];
+#include <Logger.hpp>
 
 class Shader
 {
     public:
-        Shader() {};
-        Shader(const char* vertexShaderFile, const char* fragmentShaderFile);
-        void load(const char* vertexShaderFile, const char* fragmentShaderFile);
-        void use();
+        Shader();
+        void load(const char* vsFile, const char* fsFile);
+        void use(void);
 
-        void setInt(const char* varName, int value);
-        void setVec3(const char* varName, vec3 vec);
-        void setGlmVec3(const char* varName, glm::vec3 vec3);
-        void setVec4(const char* varName, vec4 vec);
-        void setGlmVec4(const char* varName, glm::vec4 vec4);
-        void setMat4(const char* varName, glm::mat4 mat, bool transpose = false);
+        // Set shader variables
+        void setInt(const char* var, int value);
+        void setVec3f(const char* var, glm::vec3 vec);
+        void setVec4f(const char* var, glm::vec4 vec);
+        void setMat4f(const char* var, glm::mat4 mat, bool transpose = false);
 
     private:
-        void loadVertexShader(const char* vertexShaderFile);
-        void loadFragmentShader(const char* fragmentShaderFile);
-        void compile();
-        void compileVertexShader();
-        void compileFragmentShader();
-        int findVar(const char* varName);
+        int id = -1;
+        int vertexShaderID = -1;
+        int fragmentShaderID = -1;
     
-    private:
-        bool loaded = false;
-        unsigned int id = glCreateProgram();
-        unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-        unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-        std::string vertexShader = "";
-        std::string fragmentShader = "";
+        bool loadVertexShader(const char* vsFile);
+        bool loadFragmentShader(const char* fsFile);
+        bool checkShaderCompiled(int shaderID);
+
+        int findVar(const char* var);
 };

@@ -1,40 +1,24 @@
 @echo off
 
-rem sources
-set SRC_DIR=../src
+rem SOURCES
+set SOURCES=../main.cpp
+set SOURCES=%SOURCES% ../src/Logger.cpp
+set SOURCES=%SOURCES% ../src/Shader.cpp
+set SOURCES=%SOURCES% ../src/Mesh.cpp
+set SOURCES=%SOURCES% ../src/Texture.cpp
+set SOURCES=%SOURCES% ../src/Camera.cpp
 
-if "%1%"=="lighting" (
-    echo == BUILDING [%1%] ==
-    set SRCS=%SRC_DIR%/lighting/main.cpp
-) else (
-    echo == BUILDING [intro] ==
-    set SRCS=%SRC_DIR%/intro/main.cpp
-)
+rem SOURCES (3rd party)
+set SOURCES=%SOURCES% ../3rdparty/glad/glad.c
 
-set SRCS=%SRCS% %SRC_DIR%/glad.c
-set SRCS=%SRCS% %SRC_DIR%/Buffers.cpp
-set SRCS=%SRCS% %SRC_DIR%/Shader.cpp
-set SRCS=%SRCS% %SRC_DIR%/Texture.cpp
-set SRCS=%SRCS% %SRC_DIR%/Camera.cpp
+rem LIBS
+set LIBS=opengl32.lib ../3rdparty/GLFW/lib/glfw3dll.lib
 
-rem includes
-set INCLUDE_DIR=../include
-
-rem libs
-set LIB_DIR=../lib
-set LIBS=opengl32.lib %LIB_DIR%/glfw3dll.lib
-
-rem debug
-set NON_ABSTRACT=F
-if "%1%"=="--nonabstract" set NON_ABSTRACT=T
-if "%2%"=="--nonabstract" set NON_ABSTRACT=T
-if "%NON_ABSTRACT%"=="T" (
-    echo == NON ABSTRACTION ENABLED ==
-    set CPP_NONABSTRACT_FLAGS=/DNONABSTRACT
-)
+rem DEFINES
+set DEFINES=
 
 mkdir build
 pushd build
-cl -Zi %CPP_NONABSTRACT_FLAGS% /EHsc %SRCS% /I %INCLUDE_DIR% /link %LIBS%
-xcopy ..\lib\glfw3.dll . /d
-popd
+cl -Zi /std:c++17 %DEFINES% /DROOT=%ROOT_DIR% /EHsc %SOURCES% /I ../3rdparty /I ../include/ /link %LIBS%
+xcopy ..\3rdparty\GLFW\lib\glfw3.dll . /d
+popd build

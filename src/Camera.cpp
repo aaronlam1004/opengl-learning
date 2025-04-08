@@ -1,68 +1,62 @@
-#include "Camera.hpp"
+#include <Camera.hpp>
 
-Camera::Camera(glm::vec3 position)
+Camera::Camera(float sceenWidth, float sceenHeight) :
+    width(sceenWidth),
+    height(sceenHeight)
 {
-    cameraProperties.up = glm::vec3(0.0f, 1.0f, 0.0f);
-    cameraProperties.front = glm::vec3(0.0f, 0.0f, -3.0f);
-    cameraProperties.position = position;
-    cameraProperties.target = cameraProperties.position + cameraProperties.front;
 }
 
-CameraProperties Camera::properties()
+void Camera::setUp(glm::vec3 cameraUp)
 {
-    return cameraProperties;
+    up = cameraUp;
 }
 
-void Camera::setPosition(glm::vec3 position)
+void Camera::setPosition(glm::vec3 cameraPosition)
 {
-    cameraProperties.position = position;
+    position = cameraPosition;
 }
 
-void Camera::setTarget(glm::vec3 target)
+void Camera::setTarget(glm::vec3 cameraTarget)
 {
-    cameraProperties.target = target;
+    target = cameraTarget;
 }
 
-void Camera::setUpVector(glm::vec3 up)
+void Camera::setFront(glm::vec3 cameraFront)
 {
-    cameraProperties.up = up;
+    front = cameraFront;
 }
 
-void Camera::setFront(glm::vec3 front)
+glm::mat4 Camera::getLookAt(glm::vec3 cameraPosition, glm::vec3 cameraTarget)
 {
-    cameraProperties.front = front;
+    /*
+    glm::mat4 lookAt = glm::mat4(1.0f);
+    return lookAt;
+    */
+    return glm::lookAt(cameraPosition, cameraTarget, up);
 }
 
-void Camera::updatePosition(float delta, char axis)
+glm::vec3 Camera::getPosition(void)
 {
-    switch (axis)
-    {
-        case 'x':
-        {
-            glm::vec3 front = cameraProperties.front;
-            glm::vec3 up = cameraProperties.up;
-            glm::vec3 rightAxis = glm::normalize(glm::cross(front, up));
-            cameraProperties.position += rightAxis * delta;
-        } break;
-        case 'y':
-        {
-            glm::vec3 front = cameraProperties.front;
-            glm::vec3 up = cameraProperties.up;
-            glm::vec3 rightAxis = glm::normalize(glm::cross(front, up));
-            glm::vec3 upAxis = glm::normalize(glm::cross(front, rightAxis));
-            cameraProperties.position += upAxis * delta;
-        } break;
-        case 'z':
-        {
-            cameraProperties.position += cameraProperties.front * delta;
-        } break;
-        default: break;
-    }
+    return position;
 }
 
-void Camera::updateAngle(float deltaX, float deltaY)
+void Camera::view(const Entity& entity)
 {
-    float pitch = cameraProperties.pitch;
+    target = position + front;
+    view(entity, fov, position, target);
+}
+
+void Camera::view(const Entity& entity, float cameraFov, glm::vec3 cameraPosition, glm::vec3 cameraTarget)
+{   
+    glm::mat4 projection = glm::perspective(glm::radians(cameraFov), width / height, 0.1f, 100.0f);
+    entity.shader->setMat4f("projection", projection);
+    
+    glm::mat4 view = getLookAt(cameraPosition, cameraTarget);
+    entity.shader->setMat4f("view", view);
+}
+
+void Camera::updateViewAngle(float deltaX, float deltaY)
+{
     pitch += deltaY;
     if (pitch > 89.0f)
     {
@@ -72,21 +66,18 @@ void Camera::updateAngle(float deltaX, float deltaY)
     {
         pitch = -89.0f;
     }
-    cameraProperties.pitch = pitch;
-    
-    cameraProperties.yaw += deltaX;
-    float yaw = cameraProperties.yaw;
+    yaw += deltaX;
 
     glm::vec3 direction = glm::vec3(1.0f);
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraProperties.front = glm::normalize(direction);
+    
+    front = glm::normalize(direction);
 }
 
 void Camera::updateZoom(float deltaZ)
 {
-    float fov = cameraProperties.fov;
     fov -= deltaZ;
     if (fov < 1.0f)
     {
@@ -96,56 +87,18 @@ void Camera::updateZoom(float deltaZ)
     {
         fov = 45.0f;
     }
-    cameraProperties.fov = fov;
 }
 
-glm::mat4 Camera::getLookAt(glm::vec3 position, glm::vec3 target)
+void Camera::updateViewPosition(glm::vec3 deltas)
 {
-    glm::mat4 lookAt = glm::mat4(1.0f);
-#ifdef MANUAL
-    glm::vec3 position = position;
-    glm::vec3 target = target;
-    glm::vec3 up = cameraProperties.up;
+    float deltaX = deltas.x;
+    glm::vec3 rightAxis = glm::normalize(glm::cross(front, up));
+    position += rightAxis * deltaX;
 
-    glm::vec3 forwardAxis = glm::normalize(position - target);
-    glm::vec3 rightAxis = glm::normalize(glm::cross(up, forwardAxis));
-    glm::vec3 upAxis = glm::cross(forwardAxis, rightAxis);
+    float deltaY = deltas.y;
+    glm::vec3 upAxis = glm::normalize(glm::cross(front, rightAxis));
+    position += upAxis * deltaY;
 
-    glm::mat4 cameraMat = glm::mat4(
-        glm::vec4(rightAxis, 0.0f),
-        glm::vec4(upAxis, 0.0f),
-        glm::vec4(forwardAxis, 0.0f),
-        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)
-    );
-    cameraMat = glm::transpose(cameraMat);
-    glm::vec3 translateVector = glm::vec3(-position[0], -position[1], -position[2]);
-    lookAt = glm::translate(cameraMat, translateVector);
-#else
-    lookAt = glm::lookAt(position,
-                         target,
-                         cameraProperties.up);
-#endif
-    return lookAt;
-}
-
-void Camera::setTempView(Shader& shader, glm::vec3 position, glm::vec3 target)
-{
-    glm::mat4 lookAt = getLookAt(position, target);
-    shader.setMat4("view", lookAt);
-}
-
-void Camera::setTempPerspective(Shader& shader, float fov, float width, float height)
-{
-    glm::mat4 projection = glm::perspective(fov, width / height, 0.1f, 100.0f);
-    shader.setMat4("projection", projection);
-}
-
-void Camera::setCamera(Shader& shader, float width, float height)
-{
-    cameraProperties.target = cameraProperties.position + cameraProperties.front;
-    glm::mat4 lookAt = getLookAt(cameraProperties.position, cameraProperties.target);
-    shader.setMat4("view", lookAt);
-
-    glm::mat4 projection = glm::perspective(glm::radians(cameraProperties.fov), width / height, 0.1f, 100.0f);
-    shader.setMat4("projection", projection);
+    float deltaZ = deltas.z;
+    position += front * deltaZ;
 }
