@@ -27,11 +27,13 @@ void loadShaders_Scene0(void)
 
 Shader LIGHT_SHADER;
 Shader LIGHTED_CUBE_SHADER;
+Shader COLORED_LIGHT_SHADER;
 Shader MATERIAL_CUBE_SHADER;
 
 void loadShaders_Scene1(void)
 {
     LIGHT_SHADER.load("shaders/basic_lighting/lightShader.vert", "shaders/basic_lighting/lightShader.frag");
     LIGHTED_CUBE_SHADER.load("shaders/basic_lighting/shader.vert", "shaders/basic_lighting/shader.frag");
+    COLORED_LIGHT_SHADER.load("shaders/material/lightShader.vert", "shaders/material/lightShader.frag");
     MATERIAL_CUBE_SHADER.load("shaders/material/shader.vert", "shaders/material/shader.frag");
 }

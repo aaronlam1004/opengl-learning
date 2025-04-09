@@ -49,6 +49,13 @@ struct Material
     float shininess = 32.0f;
 };
 
+struct Lighting
+{
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
 struct Entity
 {
     int type     { -1 };
@@ -56,6 +63,7 @@ struct Entity
     Pos pos      { 0.0f, 0.0f, 0.0f };
     Velocity vel { 0.0f, 0.0f };
     Color color  { 1.0f, 1.0f, 1.0f };
+    float scale  { 1.0f };
 
     // TODO: add Material parameter
     
