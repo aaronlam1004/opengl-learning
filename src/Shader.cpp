@@ -125,6 +125,11 @@ void Shader::setInt(const char* var, int value)
     glUniform1i(findVar(var), value);
 }
 
+void Shader::setFloat(const char* var, float value)
+{
+    glUniform1f(findVar(var), value);
+}
+
 void Shader::setVec3f(const char* var, glm::vec3 vec)
 {
     glUniform3fv(findVar(var), 1, glm::value_ptr(vec));

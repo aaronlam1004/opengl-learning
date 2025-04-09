@@ -18,7 +18,7 @@
 Color LIGHT_COLOR { 1.0f, 1.0f, 1.0f };
 Color OBJ_COLOR   { 1.0f, 0.5f, 0.31f };
 
-Pos LIGHT_POS { 0.0f, 1.0f, -0.5f };
+Pos LIGHT_POS { 0.0f, 0.0f, 1.0f };
 Pos OBJ_POS   { 0.0f, 0.0f, 0.0f };
 
 struct EntityData_Scene1
@@ -29,6 +29,8 @@ struct EntityData_Scene1
     Pos position { 0.0f, 0.0f, 0.0f };
     Color color { 1.0f, 1.0f, 1.0f };
     bool isLighted = false;
+    
+    Material material;
     // std::vector<Texture*> textures;
     // void (*update)(Entity* self) = nullptr;
 };
@@ -37,7 +39,11 @@ std::vector<std::vector<EntityData_Scene1>> ENTITIES_SCENE1_DATA = {
     {
         { &LIGHT_SHADER, &CUBE_MESH, 0.2f, LIGHT_POS },
         { &LIGHTED_CUBE_SHADER, &LIGHTED_CUBE_MESH, 1.0f, OBJ_POS, OBJ_COLOR, true }
-    }
+    },
+    {
+        { &LIGHT_SHADER, &CUBE_MESH, 0.2f, LIGHT_POS },
+        { &MATERIAL_CUBE_SHADER, &LIGHTED_CUBE_MESH, 1.0f, OBJ_POS, OBJ_COLOR, true }
+    },
 };
 
 std::vector<std::vector<Entity>> ENTITIES_SCENE1(ENTITIES_SCENE1_DATA.size());
@@ -60,14 +66,28 @@ void setupEntities_Scene1(void)
 
             entity.pos = entityData.position;
             entity.color = entityData.color;
+            // entity.material = entityData.material;
 
             assert(entity.isLoaded());
 
             if (entityData.isLighted)
             {
+                // Color & Light
                 entity.shader->setVec3f("objectColor", glm::vec3(entity.color.r, entity.color.g, entity.color.b));
                 entity.shader->setVec3f("lightColor", glm::vec3(LIGHT_COLOR.r, LIGHT_COLOR.g, LIGHT_COLOR.b));
                 entity.shader->setVec3f("lightPos", glm::vec3(LIGHT_POS.x, LIGHT_POS.y, LIGHT_POS.z));
+
+                // Material
+                /*
+                entity.shader->setVec3f("material.ambient", entityData.material.ambient);
+                entity.shader->setVec3f("material.diffuse", entityData.material.diffuse);
+                entity.shader->setVec3f("material.specular", entityData.material.specular);
+                entity.shader->setFloat("material.shininess", entityData.material.shininess);
+                */
+                entity.shader->setVec3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+                entity.shader->setVec3f("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+                entity.shader->setVec3f("material.specular", glm::vec3(0.5, 0.5f, 0.5f));
+                entity.shader->setFloat("material.shininess", 32.0f);
             }
             
             /*

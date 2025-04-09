@@ -41,6 +41,14 @@ struct Color
     }
 };
 
+struct Material
+{
+    glm::vec3 ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    float shininess = 32.0f;
+};
+
 struct Entity
 {
     int type     { -1 };
@@ -48,6 +56,8 @@ struct Entity
     Pos pos      { 0.0f, 0.0f, 0.0f };
     Velocity vel { 0.0f, 0.0f };
     Color color  { 1.0f, 1.0f, 1.0f };
+
+    // TODO: add Material parameter
     
     Shader* shader = nullptr;
     Mesh*   mesh   = nullptr;
