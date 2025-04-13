@@ -5,6 +5,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
 #include <Scene.hpp>
 #include <Entity.hpp>
 #include <Mesh.hpp>
@@ -19,8 +22,8 @@
 Color LIGHT_COLOR { 1.0f, 1.0f, 1.0f };
 Color OBJ_COLOR   { 0.0f, 1.0f, 0.0f };
 
-Pos LIGHT_POS { 1.2f, 1.0f, 2.0f };
-Pos OBJ_POS   { 0.0f, 0.0f, 0.0f };
+Position LIGHT_POS { 1.2f, 1.0f, 2.0f };
+Position OBJ_POS   { 0.0f, 0.0f, 0.0f };
 
 struct EntityData_Scene1
 {
@@ -28,7 +31,7 @@ struct EntityData_Scene1
     Shader* shader;
     Mesh* mesh;
     float scale = 1.0f;
-    Pos position { 0.0f, 0.0f, 0.0f };
+    Position position { 0.0f, 0.0f, 0.0f };
     Color color { 1.0f, 1.0f, 1.0f };
     void (*update)(Entity* self) = nullptr;
     Material material = DEFAULT_MATERIAL;
@@ -37,6 +40,7 @@ struct EntityData_Scene1
         glm::vec3(0.5f),
         glm::vec3(1.0f)
     };
+    Position objOrigin;
     // std::vector<Texture*> textures;
 };
 
@@ -50,14 +54,21 @@ void translateAndScaleModel(Entity* self)
 
 void orbitCubeLatitude(Entity* self)
 {
-    translateAndScaleModel(self);
-    /*
+    // TODO: This is pretty bad because it is not indicative of the light's actual position in space.
+    //       Need to update this in some capacity (one way by):
+    //       - Adding parameter for list of entities that are also updated when entity is updated
+    //       - Updating object whenever light is updated and vice versa
+    
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(self->pos.x, self->pos.y, self->pos.z));
-    model = glm::rotate(model, (float) glfwGetTime() * glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, (float) glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(LIGHT_POS.x, LIGHT_POS.y, LIGHT_POS.z));
+
+    self->pos.x = (model[0][0] + model[0][1] + model[0][2] + model[0][3]) * -1;
+    self->pos.y = model[1][0] + model[1][1] + model[1][2] + model[1][3];
+    self->pos.z = model[2][0] + model[2][1] + model[2][2] + model[2][3];
+
     model = glm::scale(model, glm::vec3(self->scale));
     self->shader->setMat4f("model", model);
-    */
 }
 
 void updateLightColor(Entity* self)
@@ -170,8 +181,6 @@ void renderEntity_Scene1(int index)
 
         entity.shader->setVec3f("lightPos", lightPos);
         entity.shader->setVec3f("lightColor", lightColor);
-
-        
         
         camera.view(entity);
 

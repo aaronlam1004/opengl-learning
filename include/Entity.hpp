@@ -16,7 +16,7 @@ struct Size
     float height;
 };
 
-struct Pos
+struct Position
 {
     float x;
     float y;
@@ -60,7 +60,7 @@ struct Entity
 {
     int type     { -1 };
     Size size    { 0.0f, 0.0f };
-    Pos pos      { 0.0f, 0.0f, 0.0f };
+    Position pos { 0.0f, 0.0f, 0.0f };
     Velocity vel { 0.0f, 0.0f };
     Color color  { 1.0f, 1.0f, 1.0f };
     float scale  { 1.0f };
