@@ -63,6 +63,8 @@ void orbitCubeLatitude(Entity* self)
     model = glm::rotate(model, (float) glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::translate(model, glm::vec3(LIGHT_POS.x, LIGHT_POS.y, LIGHT_POS.z));
 
+    // TODO: Should probably add method to convert mat4x4 to vector using this method (minus the multiply of -1)
+    
     self->pos.x = (model[0][0] + model[0][1] + model[0][2] + model[0][3]) * -1;
     self->pos.y = model[1][0] + model[1][1] + model[1][2] + model[1][3];
     self->pos.z = model[2][0] + model[2][1] + model[2][2] + model[2][3];
